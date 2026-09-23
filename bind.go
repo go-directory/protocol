@@ -20,14 +20,14 @@ type BindRequest struct {
 	Authentication AuthenticationChoice
 }
 
+func (_ BindRequest) isProtocolOp()  {}
+func (_ BindRequest) isRequestOp()   {}
 func (_ BindRequest) Kind() string   { return `request` }
 func (_ BindRequest) Choice() string { return nameBindRequestChoice }
 func (_ BindRequest) Tag() int       { return TagBindRequest }
 func (_ BindRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagBindRequest))
 }
-func (_ BindRequest) isProtocolOp() {}
-func (_ BindRequest) isRequestOp()  {}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -145,12 +145,12 @@ type SaslCredentials struct {
 	Credentials *OctetString
 }
 
-func (_ SaslCredentials) classTag() asn1.Tag {
-	return aTag(asn1.ClassContextSpecific, true, uint32(TagAuthenticationChoiceSaslCredentials))
-}
 func (_ SaslCredentials) Tag() int       { return TagAuthenticationChoiceSaslCredentials }
 func (_ SaslCredentials) Choice() string { return "sasl" }
 func (_ SaslCredentials) isAuthChoice()  {}
+func (_ SaslCredentials) classTag() asn1.Tag {
+	return aTag(asn1.ClassContextSpecific, true, uint32(TagAuthenticationChoiceSaslCredentials))
+}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -216,12 +216,12 @@ and serves as the "simple" CHOICE of [AuthenticationChoice].
 */
 type SimpleCredentials OctetString
 
-func (_ SimpleCredentials) classTag() asn1.Tag {
-	return aTag(asn1.ClassContextSpecific, false, uint32(TagAuthenticationChoiceSimple))
-}
 func (_ SimpleCredentials) Tag() int       { return TagAuthenticationChoiceSimple }
 func (_ SimpleCredentials) Choice() string { return "simple" }
 func (_ SimpleCredentials) isAuthChoice()  {}
+func (_ SimpleCredentials) classTag() asn1.Tag {
+	return aTag(asn1.ClassContextSpecific, false, uint32(TagAuthenticationChoiceSimple))
+}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -270,14 +270,14 @@ type BindResponse struct {
 	ServerSaslCreds *OctetString
 }
 
+func (_ BindResponse) isProtocolOp()  {}
+func (_ BindResponse) isResponseOp()  {}
+func (_ BindResponse) Tag() int       { return TagBindResponse }
 func (_ BindResponse) Kind() string   { return `response` }
 func (_ BindResponse) Choice() string { return nameBindResponseChoice }
 func (_ BindResponse) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagBindResponse))
 }
-func (_ BindResponse) Tag() int      { return TagBindResponse }
-func (_ BindResponse) isProtocolOp() {}
-func (_ BindResponse) isResponseOp() {}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -359,22 +359,33 @@ Note that there is no response counterpart definition for this type.
 */
 type UnbindRequest Null
 
+func (_ UnbindRequest) isProtocolOp()  {}
+func (_ UnbindRequest) isRequestOp()   {}
 func (_ UnbindRequest) Kind() string   { return `request` }
 func (_ UnbindRequest) Choice() string { return nameUnbindRequestChoice }
 func (_ UnbindRequest) Tag() int       { return TagUnbindRequest }
 func (_ UnbindRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, false, uint32(TagUnbindRequest))
 }
-func (_ UnbindRequest) isProtocolOp() {}
-func (_ UnbindRequest) isRequestOp()  {}
 
+/*
+Encode returns an instance of []byte alongside an error following an
+attempt to encode the contents of the receiver instance as an
+[APPLICATION 2] NULL context.
+*/
 func (r UnbindRequest) Encode() ([]byte, error) {
 	enc, _ := Null(r).Encode()             // UNIVERSAL NULL
 	return asn1.WrapTLV(enc, r.classTag()) // [APPLICATION 2]
 }
 
+/*
+Decode returns an error following an attempt to decode and write the
+input encoding to the receiver instance. The encoding must not be
+truncated, and must bear the [APPLICATION 2] NULL tag.
+*/
 func (r UnbindRequest) Decode(enc []byte) error {
-	enc, err := asn1.UnwrapTLV(enc, r.classTag()) // [APPLICATION 2]
+	var err error
+	enc, err = asn1.UnwrapTLV(enc, r.classTag()) // [APPLICATION 2]
 	if err == nil {
 		err = checkNullEncoding(enc) // UNIVERSAL NULL
 	}

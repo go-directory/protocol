@@ -18,6 +18,8 @@ type AddRequest struct {
 	Attributes AttributeList
 }
 
+func (_ AddRequest) isProtocolOp()  {}
+func (_ AddRequest) isRequestOp()   {}
 func (_ AddRequest) Kind() string   { return `request` }
 func (_ AddRequest) Choice() string { return nameAddRequestChoice }
 func (_ AddRequest) Tag() int       { return TagAddRequest }
@@ -65,9 +67,6 @@ func (r *AddRequest) Decode(enc []byte) error {
 
 }
 
-func (_ AddRequest) isProtocolOp() {}
-func (_ AddRequest) isRequestOp()  {}
-
 /*
 	AddResponse ::= [APPLICATION 9] LDAPResult
 
@@ -77,6 +76,8 @@ AddResponse implements [§ 4.7 of RFC4511].
 */
 type AddResponse LDAPResult
 
+func (_ AddResponse) isProtocolOp()  {}
+func (_ AddResponse) isResponseOp()  {}
 func (_ AddResponse) Kind() string   { return `response` }
 func (_ AddResponse) Choice() string { return nameAddResponseChoice }
 func (_ AddResponse) Tag() int       { return TagAddResponse }
@@ -105,6 +106,3 @@ func (r *AddResponse) Decode(enc []byte) error {
 
 	return err
 }
-
-func (_ AddResponse) isProtocolOp() {}
-func (_ AddResponse) isResponseOp() {}

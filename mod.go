@@ -46,6 +46,8 @@ type ModifyRequestChange struct {
 	Modification PartialAttribute
 }
 
+func (_ ModifyRequest) isProtocolOp()  {}
+func (_ ModifyRequest) isRequestOp()   {}
 func (_ ModifyRequest) Kind() string   { return `request` }
 func (_ ModifyRequest) Choice() string { return nameModifyRequestChoice }
 func (_ ModifyRequest) Tag() int       { return TagModifyRequest }
@@ -173,9 +175,6 @@ func (r *ModifyRequestChange) Decode(enc []byte) error {
 	return err
 }
 
-func (_ ModifyRequest) isProtocolOp() {}
-func (_ ModifyRequest) isRequestOp()  {}
-
 /*
 	ModifyResponse ::= [APPLICATION 7] LDAPResult
 
@@ -185,6 +184,8 @@ ModifyResponse implements [§ 4.6 of RFC4511], circumscribing an [LDAPResult].
 */
 type ModifyResponse LDAPResult
 
+func (_ ModifyResponse) isProtocolOp()  {}
+func (_ ModifyResponse) isResponseOp()  {}
 func (_ ModifyResponse) Kind() string   { return `response` }
 func (_ ModifyResponse) Choice() string { return nameModifyResponseChoice }
 func (_ ModifyResponse) Tag() int       { return TagModifyResponse }
@@ -223,6 +224,3 @@ func (r *ModifyResponse) Decode(enc []byte) error {
 
 	return err
 }
-
-func (_ ModifyResponse) isProtocolOp() {}
-func (_ ModifyResponse) isResponseOp() {}

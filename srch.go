@@ -260,7 +260,7 @@ func (r *SearchRequest) decodeFilter(c *int, payload []byte) (err error) {
 
 	// Unlike previous components of this type, filter
 	// can start with any one of ten possible tags, so
-	// we can't rely on targeting a specific tag.
+	// we can't rely on targeting any specific one.
 	tag, _ := asn1.ReadTag(payload[p:])
 	if !(0 <= tag.Tag && tag.Tag <= 9) {
 		// not a filter ...
