@@ -18,7 +18,9 @@ type AddRequest struct {
 	Attributes AttributeList
 }
 
-func (_ AddRequest) Tag() int { return TagAddRequest }
+func (_ AddRequest) Kind() string   { return `request` }
+func (_ AddRequest) Choice() string { return nameAddRequestChoice }
+func (_ AddRequest) Tag() int       { return TagAddRequest }
 func (_ AddRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagAddRequest))
 }
@@ -40,7 +42,7 @@ func (r AddRequest) Encode() ([]byte, error) {
 
 func (r *AddRequest) Decode(enc []byte) error {
 	payload, err := asn1.UnwrapTLV(enc,
-		r.classTag(), // [APPLICAITON 8]
+		r.classTag(), // [APPLICATION 8]
 		uSeqTag())    // SEQUENCE
 
 	if err == nil {
@@ -75,7 +77,9 @@ AddResponse implements [§ 4.7 of RFC4511].
 */
 type AddResponse LDAPResult
 
-func (_ AddResponse) Tag() int { return TagAddResponse }
+func (_ AddResponse) Kind() string   { return `response` }
+func (_ AddResponse) Choice() string { return nameAddResponseChoice }
+func (_ AddResponse) Tag() int       { return TagAddResponse }
 func (_ AddResponse) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagAddResponse))
 }

@@ -18,7 +18,9 @@ type CompareRequest struct {
 	AVA   AttributeValueAssertion
 }
 
-func (_ CompareRequest) Tag() int { return TagCompareRequest }
+func (_ CompareRequest) Kind() string   { return `request` }
+func (_ CompareRequest) Choice() string { return nameCompareRequestChoice }
+func (_ CompareRequest) Tag() int       { return TagCompareRequest }
 func (_ CompareRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagCompareRequest))
 }
@@ -84,7 +86,9 @@ CompareResponse implements [§ 4.10 of RFC4511].
 */
 type CompareResponse LDAPResult
 
-func (_ CompareResponse) Tag() int { return TagCompareResponse }
+func (_ CompareResponse) Kind() string   { return `response` }
+func (_ CompareResponse) Choice() string { return nameCompareResponseChoice }
+func (_ CompareResponse) Tag() int       { return TagCompareResponse }
 func (_ CompareResponse) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagCompareResponse))
 }

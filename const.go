@@ -65,11 +65,11 @@ var enumeratedModifyRequestChangeOperation = map[Enumerated]string{
 	modifyRequestChangeOperationReplace: "replace",
 }
 
-const ( 
+const (
 	UBMessageID = MaxInt
 	UBSizeLimit = MaxInt
 	UBTimeLimit = MaxInt
 )
 
-//	maxInt INTEGER ::= 2147483647
+// maxInt INTEGER ::= 2147483647
 const MaxInt = 2147483647

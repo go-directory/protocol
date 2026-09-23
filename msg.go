@@ -15,6 +15,8 @@ types.
 */
 type ProtocolOp interface {
 	Encode() ([]byte, error)
+	Choice() string
+	Kind() string
 	Tag() int
 	isProtocolOp()
 }
@@ -27,6 +29,8 @@ types defined throughout the subsections of [§ 4.1 of RFC4511].
 */
 type Request interface {
 	Encode() ([]byte, error)
+	Choice() string
+	Kind() string
 	Tag() int
 	isProtocolOp()
 	isRequestOp()
@@ -40,10 +44,42 @@ types defined throughout the subsections of [§ 4.1 of RFC4511].
 */
 type Response interface {
 	Encode() ([]byte, error)
+	Choice() string
+	Kind() string
 	Tag() int
 	isProtocolOp()
 	isResponseOp()
 }
+
+// request CHOICE names
+const (
+	nameAbandonRequestChoice  = `abandonRequest`
+	nameAddRequestChoice      = `addRequest`
+	nameBindRequestChoice     = `bindRequest`
+	nameCompareRequestChoice  = `compareRequest`
+	nameDelRequestChoice      = `delRequest`
+	nameExtendedRequestChoice = `extendedReq`
+	nameModifyRequestChoice   = `modifyRequest`
+	nameModifyDNRequestChoice = `modDNRequest`
+	nameSearchRequestChoice   = `searchRequest`
+	nameUnbindRequestChoice   = `unbindRequest`
+)
+
+// response CHOICE names
+const (
+	nameAddResponseChoice           = `addResponse`
+	nameBindResponseChoice          = `bindResponse`
+	nameCompareResponseChoice       = `compareResponse`
+	nameDelResponseChoice           = `delResponse`
+	nameIntermediateResponseChoice  = `intermediateResponse`
+	nameExtendedResponseChoice      = `extendedResp`
+	nameModifyResponseChoice        = `modifyResponse`
+	nameModifyDNResponseChoice      = `modDNResponse`
+	nameSearchResponseChoice        = `searchResponse`
+	nameSearchResultEntryChoice     = `searchResEntry`
+	nameSearchResultDoneChoice      = `searchResDone`
+	nameSearchResultReferenceChoice = `searchResRef`
+)
 
 /*
 	MessageID ::= INTEGER (0 ..  maxInt)

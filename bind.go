@@ -20,7 +20,9 @@ type BindRequest struct {
 	Authentication AuthenticationChoice
 }
 
-func (_ BindRequest) Tag() int { return TagBindRequest }
+func (_ BindRequest) Kind() string   { return `request` }
+func (_ BindRequest) Choice() string { return nameBindRequestChoice }
+func (_ BindRequest) Tag() int       { return TagBindRequest }
 func (_ BindRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagBindRequest))
 }
@@ -268,6 +270,8 @@ type BindResponse struct {
 	ServerSaslCreds *OctetString
 }
 
+func (_ BindResponse) Kind() string   { return `response` }
+func (_ BindResponse) Choice() string { return nameBindResponseChoice }
 func (_ BindResponse) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagBindResponse))
 }
@@ -355,7 +359,9 @@ Note that there is no response counterpart definition for this type.
 */
 type UnbindRequest Null
 
-func (_ UnbindRequest) Tag() int { return TagUnbindRequest }
+func (_ UnbindRequest) Kind() string   { return `request` }
+func (_ UnbindRequest) Choice() string { return nameUnbindRequestChoice }
+func (_ UnbindRequest) Tag() int       { return TagUnbindRequest }
 func (_ UnbindRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, false, uint32(TagUnbindRequest))
 }

@@ -46,7 +46,9 @@ type ModifyRequestChange struct {
 	Modification PartialAttribute
 }
 
-func (_ ModifyRequest) Tag() int { return TagModifyRequest }
+func (_ ModifyRequest) Kind() string   { return `request` }
+func (_ ModifyRequest) Choice() string { return nameModifyRequestChoice }
+func (_ ModifyRequest) Tag() int       { return TagModifyRequest }
 func (_ ModifyRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagModifyRequest))
 }
@@ -183,7 +185,9 @@ ModifyResponse implements [§ 4.6 of RFC4511], circumscribing an [LDAPResult].
 */
 type ModifyResponse LDAPResult
 
-func (_ ModifyResponse) Tag() int { return TagModifyResponse }
+func (_ ModifyResponse) Kind() string   { return `response` }
+func (_ ModifyResponse) Choice() string { return nameModifyResponseChoice }
+func (_ ModifyResponse) Tag() int       { return TagModifyResponse }
 func (_ ModifyResponse) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagModifyResponse))
 }

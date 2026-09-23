@@ -22,7 +22,9 @@ type ModifyDNRequest struct {
 	NewSuperior  *LDAPDN
 }
 
-func (_ ModifyDNRequest) Tag() int { return TagModifyDNRequest }
+func (_ ModifyDNRequest) Kind() string   { return `request` }
+func (_ ModifyDNRequest) Choice() string { return nameModifyDNRequestChoice }
+func (_ ModifyDNRequest) Tag() int       { return TagModifyDNRequest }
 func (_ ModifyDNRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagModifyDNRequest))
 }
@@ -129,7 +131,9 @@ ModifyDNResponse implements [§ 4.9 of RFC4511], circumscribing an [LDAPResult].
 */
 type ModifyDNResponse LDAPResult
 
-func (_ ModifyDNResponse) Tag() int { return TagModifyDNResponse }
+func (_ ModifyDNResponse) Kind() string   { return `response` }
+func (_ ModifyDNResponse) Choice() string { return nameModifyDNResponseChoice }
+func (_ ModifyDNResponse) Tag() int       { return TagModifyDNResponse }
 func (_ ModifyDNResponse) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagModifyDNResponse))
 }

@@ -18,7 +18,9 @@ type IntermediateResponse struct {
 	ResponseValue *OctetString
 }
 
-func (_ IntermediateResponse) Tag() int { return TagIntermediateResponse }
+func (_ IntermediateResponse) Kind() string   { return `response` }
+func (_ IntermediateResponse) Choice() string { return nameIntermediateResponseChoice }
+func (_ IntermediateResponse) Tag() int       { return TagIntermediateResponse }
 func (_ IntermediateResponse) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagIntermediateResponse))
 }

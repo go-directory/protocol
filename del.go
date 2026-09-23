@@ -14,7 +14,9 @@ DelRequest implements [§ 4.8 of RFC4511].
 */
 type DelRequest syntax.LDAPDN
 
-func (_ DelRequest) Tag() int { return TagDelRequest }
+func (_ DelRequest) Kind() string   { return `request` }
+func (_ DelRequest) Choice() string { return nameDelRequestChoice }
+func (_ DelRequest) Tag() int       { return TagDelRequest }
 func (_ DelRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, false, uint32(TagDelRequest))
 }
@@ -62,7 +64,9 @@ DelRequest implements [§ 4.8 of RFC4511], circumscribing an [LDAPResult].
 */
 type DelResponse LDAPResult
 
-func (_ DelResponse) Tag() int { return TagDelResponse }
+func (_ DelResponse) Kind() string   { return `response` }
+func (_ DelResponse) Choice() string { return nameDelResponseChoice }
+func (_ DelResponse) Tag() int       { return TagDelResponse }
 func (_ DelResponse) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagDelResponse))
 }

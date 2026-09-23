@@ -15,9 +15,11 @@ Note that there is no response counterpart definition for this type.
 */
 type AbandonRequest MessageID
 
-func (_ AbandonRequest) Tag() int      { return TagAbandonRequest }
-func (_ AbandonRequest) isProtocolOp() {}
-func (_ AbandonRequest) isRequestOp()  {}
+func (_ AbandonRequest) Kind() string   { return `request` }
+func (_ AbandonRequest) Choice() string { return nameAbandonRequestChoice }
+func (_ AbandonRequest) Tag() int       { return TagAbandonRequest }
+func (_ AbandonRequest) isProtocolOp()  {}
+func (_ AbandonRequest) isRequestOp()   {}
 
 /*
 Encode returns an instance of []byte alongside an error following

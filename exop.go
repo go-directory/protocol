@@ -18,6 +18,8 @@ type ExtendedRequest struct {
 	RequestValue *OctetString
 }
 
+func (_ ExtendedRequest) Kind() string   { return `request` }
+func (_ ExtendedRequest) Choice() string { return nameExtendedRequestChoice }
 func (_ ExtendedRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagExtendedRequest))
 }
@@ -222,6 +224,8 @@ func (r *ExtendedResponse) Decode(enc []byte) error {
 	return err
 }
 
+func (_ ExtendedResponse) Kind() string   { return `response` }
+func (_ ExtendedResponse) Choice() string { return nameExtendedResponseChoice }
 func (_ ExtendedResponse) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagExtendedResponse))
 }

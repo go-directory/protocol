@@ -75,7 +75,9 @@ type SearchRequest struct {
 	Attributes   AttributeSelection
 }
 
-func (_ SearchRequest) Tag() int { return TagSearchRequest }
+func (_ SearchRequest) Kind() string   { return `request` }
+func (_ SearchRequest) Choice() string { return nameSearchRequestChoice }
+func (_ SearchRequest) Tag() int       { return TagSearchRequest }
 func (_ SearchRequest) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagSearchRequest))
 }
@@ -372,9 +374,11 @@ type SearchResultEntry struct {
 	Attributes PartialAttributeList
 }
 
-func (_ SearchResultEntry) isProtocolOp() {}
-func (_ SearchResultEntry) isResponseOp() {}
-func (_ SearchResultEntry) Tag() int      { return TagSearchResultEntry }
+func (_ SearchResultEntry) Kind() string   { return `response` }
+func (_ SearchResultEntry) Choice() string { return nameSearchResultEntryChoice }
+func (_ SearchResultEntry) isProtocolOp()  {}
+func (_ SearchResultEntry) isResponseOp()  {}
+func (_ SearchResultEntry) Tag() int       { return TagSearchResultEntry }
 func (_ SearchResultEntry) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagSearchResultEntry))
 }
@@ -436,9 +440,11 @@ SearchResultReference implements [§ 4.5.2 of RFC4511].
 */
 type SearchResultReference []URI
 
-func (_ SearchResultReference) isProtocolOp() {}
-func (_ SearchResultReference) isResponseOp() {}
-func (_ SearchResultReference) Tag() int      { return TagSearchResultReference }
+func (_ SearchResultReference) Kind() string   { return `response` }
+func (_ SearchResultReference) Choice() string { return nameSearchResultReferenceChoice }
+func (_ SearchResultReference) isProtocolOp()  {}
+func (_ SearchResultReference) isResponseOp()  {}
+func (_ SearchResultReference) Tag() int       { return TagSearchResultReference }
 func (_ SearchResultReference) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagSearchResultReference))
 }
@@ -491,9 +497,11 @@ an [LDAPResult] SEQUENCE.
 */
 type SearchResultDone LDAPResult
 
-func (_ SearchResultDone) isProtocolOp() {}
-func (_ SearchResultDone) isResponseOp() {}
-func (_ SearchResultDone) Tag() int      { return TagSearchResultDone }
+func (_ SearchResultDone) Kind() string   { return `response` }
+func (_ SearchResultDone) Choice() string { return nameSearchResultDoneChoice }
+func (_ SearchResultDone) isProtocolOp()  {}
+func (_ SearchResultDone) isResponseOp()  {}
+func (_ SearchResultDone) Tag() int       { return TagSearchResultDone }
 func (_ SearchResultDone) classTag() asn1.Tag {
 	return aTag(asn1.ClassApplication, true, uint32(TagSearchResultDone))
 }
