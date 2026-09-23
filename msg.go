@@ -125,9 +125,18 @@ type LDAPMessage struct {
 }
 
 /*
-NewLDAPMessage initializes and returns an instance of *[LDAPMessage].
+NewLDAPMessage initializes and returns an instance of *[LDAPMessage]. The
+optional variadic [ProtocolOp] argument will result in the provided instance
+being assigned to the underlying "ProtocolOp" component.
 */
-func NewLDAPMessage() *LDAPMessage { return &LDAPMessage{} }
+func NewLDAPMessage(op ...ProtocolOp) *LDAPMessage {
+	m := &LDAPMessage{}
+	if len(op) > 0 && op[0] != nil {
+		m.ProtocolOp = op[0]
+	}
+
+	return m
+}
 
 /*
 Encode returns an instance of []byte alongside an error following
