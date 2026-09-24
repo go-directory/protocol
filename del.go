@@ -1,7 +1,6 @@
 package protocol
 
 import (
-	"github.com/go-directory/encoding/asn1"
 	"github.com/go-directory/syntax"
 )
 
@@ -17,11 +16,8 @@ type DelRequest syntax.LDAPDN
 func (_ DelRequest) Kind() string   { return `request` }
 func (_ DelRequest) Choice() string { return nameDelRequestChoice }
 func (_ DelRequest) Tag() int       { return TagDelRequest }
-func (_ DelRequest) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, false, uint32(TagDelRequest))
-}
-func (_ DelRequest) isProtocolOp() {}
-func (_ DelRequest) isRequestOp()  {}
+func (_ DelRequest) isProtocolOp()  {}
+func (_ DelRequest) isRequestOp()   {}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -32,7 +28,7 @@ func (r DelRequest) Encode() ([]byte, error) {
 	var enc []byte
 	payload, err := OctetString(r).Encode()
 	if err == nil {
-		enc, err = asn1.WrapTLV(payload, r.classTag()) // [APPLICATION 10]
+		enc, err = wrapTLV(payload, r.classTag()) // [APPLICATION 10]
 	}
 
 	return enc, err
@@ -44,7 +40,7 @@ the input encoding to the receiver instance. The encoding must not
 be truncated, and must bear the [APPLICATION 10] tag.
 */
 func (r *DelRequest) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, r.classTag()) // [APPLICATION 10]
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 10]
 	if err == nil {
 		var dec OctetString
 		if err = dec.Decode(payload); err == nil {
@@ -67,11 +63,8 @@ type DelResponse LDAPResult
 func (_ DelResponse) Kind() string   { return `response` }
 func (_ DelResponse) Choice() string { return nameDelResponseChoice }
 func (_ DelResponse) Tag() int       { return TagDelResponse }
-func (_ DelResponse) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagDelResponse))
-}
-func (_ DelResponse) isProtocolOp() {}
-func (_ DelResponse) isResponseOp() {}
+func (_ DelResponse) isProtocolOp()  {}
+func (_ DelResponse) isResponseOp()  {}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -82,7 +75,7 @@ func (r DelResponse) Encode() ([]byte, error) {
 	var enc []byte
 	res, err := LDAPResult(r).Encode() // LDAPResult SEQUENCE
 	if err == nil {
-		enc, err = asn1.WrapTLV(res, r.classTag()) // [APPLICATION 11]
+		enc, err = wrapTLV(res, r.classTag()) // [APPLICATION 11]
 	}
 
 	return enc, err
@@ -95,7 +88,7 @@ be truncated, and must bear the [APPLICATION 11] tag, circumscribing
 an [LDAPResult] SEQUENCE.
 */
 func (r *DelResponse) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, r.classTag()) // [APPLICATION 11]
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 11]
 	if err == nil {
 		var dec LDAPResult
 		if err = dec.Decode(payload); err == nil { // LDAPResult SEQUENCE

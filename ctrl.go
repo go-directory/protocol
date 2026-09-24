@@ -1,9 +1,5 @@
 package protocol
 
-import (
-	"github.com/go-directory/encoding/asn1"
-)
-
 /*
 	Control ::= SEQUENCE {
 		controlType  LDAPOID,
@@ -68,7 +64,7 @@ func (r Control) Encode() ([]byte, error) {
 
 	var out []byte
 	if err == nil {
-		out, err = asn1.WrapTLV(payload, uSeqTag()) // SEQUENCE
+		out, err = wrapTLV(payload, uSeqTag()) // SEQUENCE
 	}
 
 	return out, err
@@ -81,23 +77,21 @@ The encoding must not be truncated and must bear the
 ASN.1 UNIVERSAL SEQUENCE tag (0x30).
 */
 func (r *Control) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, uSeqTag()) // SEQUENCE
+	payload, err := unwrapTLV(enc, uSeqTag()) // SEQUENCE
 	if err == nil {
 		p := 0
-		r.ControlType, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-			asn1.ClassUniversal, uint32(asn1.TagOctetString))
+		r.ControlType, err = readEPTLV(payload, &p, classU, uint32(tOct))
 
 		if err == nil {
 			var critPayload []byte
-			critPayload, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-				asn1.ClassUniversal, uint32(asn1.TagBoolean))
+			critPayload, err = readEPTLV(payload, &p, classU, uint32(tBool))
 			if err == nil {
 				r.Criticality = critPayload[0] == 0xFF
 
 				if p < len(payload) {
 					// OPTIONAL control value detected
-					r.ControlValue, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-						asn1.ClassUniversal, uint32(asn1.TagOctetString))
+					r.ControlValue, err = readEPTLV(payload,
+						&p, classU, uint32(tOct))
 				}
 			}
 		}
@@ -136,7 +130,7 @@ func (r Controls) Encode() ([]byte, error) {
 	}
 
 	if err == nil {
-		out, err = asn1.WrapTLV(out, uSeqTag()) // SEQUENCE OF
+		out, err = wrapTLV(out, uSeqTag()) // SEQUENCE OF
 	}
 
 	return out, err
@@ -150,15 +144,14 @@ SEQUENCE OF tag.
 */
 func (r *Controls) Decode(enc []byte) error {
 	// unwrap SEQUENCE OF Control
-	payload, err := asn1.UnwrapTLV(enc, uSeqTag()) // SEQUENCE OF
+	payload, err := unwrapTLV(enc, uSeqTag()) // SEQUENCE OF
 	if err == nil {
 		p := 0
 		// Iterate individual Control elements
 		// for the length of the payload.
 		for p < len(payload) && err == nil {
 			var cb []byte
-			cb, err = asn1.ReadExpectedConstructedTLV(payload, &p,
-				asn1.ClassUniversal, uint32(asn1.TagSequence))
+			cb, err = readECTLV(payload, &p, classU, uint32(tSeq))
 
 			if err == nil {
 				// Decode individual Control

@@ -1,9 +1,5 @@
 package protocol
 
-import (
-	"github.com/go-directory/encoding/asn1"
-)
-
 /*
 	BindRequest ::= [APPLICATION 0] SEQUENCE {
 		version                 INTEGER (1 ..  127),
@@ -25,9 +21,6 @@ func (_ BindRequest) isRequestOp()   {}
 func (_ BindRequest) Kind() string   { return `request` }
 func (_ BindRequest) Choice() string { return nameBindRequestChoice }
 func (_ BindRequest) Tag() int       { return TagBindRequest }
-func (_ BindRequest) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagBindRequest))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -50,7 +43,7 @@ func (r BindRequest) Encode() ([]byte, error) {
 			payload, err = r.Authentication.Encode()
 			if err == nil {
 				enc = append(enc, payload...)
-				enc, err = asn1.WrapTLV(enc,
+				enc, err = wrapTLV(enc,
 					uSeqTag(),    // SEQUENCE
 					r.classTag()) // [APPLICATION 0]
 			}
@@ -66,21 +59,19 @@ the input encoding to the receiver instance. The encoding must
 not be truncated, and must bear the [APPLICATION 0] SEQUENCE tag.
 */
 func (r *BindRequest) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc,
+	payload, err := unwrapTLV(enc,
 		r.classTag(), // [APPLICATION 0]
 		uSeqTag())    // SEQUENCE
 
 	if err == nil {
 		p := 0
-		_, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-			asn1.ClassUniversal, uint32(asn1.TagInteger))
+		_, err = readEPTLV(payload, &p, classU, uint32(tInt))
 		if err == nil {
 			val := payload[:p]
 			if err = r.Version.Decode(val); err == nil {
 				payload = payload[p:]
 				p = 0
-				_, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-					asn1.ClassUniversal, uint32(asn1.TagOctetString))
+				_, err = readEPTLV(payload, &p, classU, uint32(tOct))
 				if err == nil {
 					val = payload[:p]
 					if err = r.Name.Decode(val); err == nil {
@@ -95,7 +86,7 @@ func (r *BindRequest) Decode(enc []byte) error {
 }
 
 func (r *BindRequest) setAuthChoice(payload []byte) (err error) {
-	tag, _ := asn1.ReadTag(payload)
+	tag, _ := readTag(payload)
 	if tag.Tag == TagAuthenticationChoiceSaslCredentials {
 		creds := &SaslCredentials{}
 		err = creds.Decode(payload)
@@ -148,9 +139,6 @@ type SaslCredentials struct {
 func (_ SaslCredentials) Tag() int       { return TagAuthenticationChoiceSaslCredentials }
 func (_ SaslCredentials) Choice() string { return "sasl" }
 func (_ SaslCredentials) isAuthChoice()  {}
-func (_ SaslCredentials) classTag() asn1.Tag {
-	return aTag(asn1.ClassContextSpecific, true, uint32(TagAuthenticationChoiceSaslCredentials))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -169,7 +157,7 @@ func (r SaslCredentials) Encode() ([]byte, error) {
 			}
 		}
 
-		enc, err = asn1.WrapTLV(enc,
+		enc, err = wrapTLV(enc,
 			uSeqTag(),    // SEQUENCE
 			r.classTag()) // CONTEXT-SPECIFIC [3]
 	}
@@ -184,15 +172,14 @@ not be truncated and must bear the CONTEXT-SPECIFIC tag of [3],
 circumscribing a SEQUENCE.
 */
 func (r *SaslCredentials) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc,
+	payload, err := unwrapTLV(enc,
 		r.classTag(), // CONTEXT-SPECIFIC [3]
 		uSeqTag())    // SEQUENCE
 
 	if err == nil {
 		p := 0
 		var val []byte
-		val, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-			asn1.ClassUniversal, uint32(asn1.TagOctetString))
+		val, err = readEPTLV(payload, &p, classU, uint32(tOct))
 
 		if err == nil {
 			r.Mechanism = val
@@ -219,9 +206,6 @@ type SimpleCredentials OctetString
 func (_ SimpleCredentials) Tag() int       { return TagAuthenticationChoiceSimple }
 func (_ SimpleCredentials) Choice() string { return "simple" }
 func (_ SimpleCredentials) isAuthChoice()  {}
-func (_ SimpleCredentials) classTag() asn1.Tag {
-	return aTag(asn1.ClassContextSpecific, false, uint32(TagAuthenticationChoiceSimple))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -231,7 +215,7 @@ a CONTEXT-SPECIFIC tag of [0], per [AuthenticationChoice].
 func (r SimpleCredentials) Encode() ([]byte, error) {
 	enc, err := OctetString(r).Encode()
 	if err == nil {
-		enc, err = asn1.WrapTLV(enc, r.classTag()) // CONTEXT-SPECIFIC [0]
+		enc, err = wrapTLV(enc, r.classTag()) // CONTEXT-SPECIFIC [0]
 	}
 
 	return enc, err
@@ -244,7 +228,7 @@ not be truncated and must bear the CONTEXT-SPECIFIC tag of [0],
 circumscribing an [OctetString] encoding.
 */
 func (r *SimpleCredentials) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, r.classTag()) // CONTEXT-SPECIFIC [0]
+	payload, err := unwrapTLV(enc, r.classTag()) // CONTEXT-SPECIFIC [0]
 
 	if err == nil {
 		var dec OctetString
@@ -275,9 +259,6 @@ func (_ BindResponse) isResponseOp()  {}
 func (_ BindResponse) Tag() int       { return TagBindResponse }
 func (_ BindResponse) Kind() string   { return `response` }
 func (_ BindResponse) Choice() string { return nameBindResponseChoice }
-func (_ BindResponse) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagBindResponse))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -292,14 +273,14 @@ func (r BindResponse) Encode() ([]byte, error) {
 		// outer SEQUENCE layer, leaving
 		// just the component values.
 		// Those are what we keep.
-		res, err = asn1.UnwrapTLV(res, uSeqTag())
+		res, err = unwrapTLV(res, uSeqTag())
 		if err == nil {
 			enc = append(enc, res...)
 			if r.ServerSaslCreds != nil {
 				res, err = r.ServerSaslCreds.Encode()
 				if err == nil {
-					res, err = asn1.WrapTLV(res,
-						aTag(asn1.ClassContextSpecific, false,
+					res, err = wrapTLV(res,
+						aTag(classC, false,
 							uint32(TagBindResponseServerSaslCreds)))
 					if err == nil {
 						enc = append(enc, res...)
@@ -308,7 +289,7 @@ func (r BindResponse) Encode() ([]byte, error) {
 			}
 
 			if err == nil {
-				enc, err = asn1.WrapTLV(enc,
+				enc, err = wrapTLV(enc,
 					uSeqTag(),    // SEQUENCE
 					r.classTag()) // [APPLICATION 1]
 			}
@@ -324,7 +305,7 @@ the input encoding to the receiver instance.  The encoding must
 not be truncated and must bear the [APPLICATION 1] SEQUENCE tag.
 */
 func (r *BindResponse) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc,
+	payload, err := unwrapTLV(enc,
 		r.classTag(), // [APPLICATION 1]
 		uSeqTag())    // SEQUENCE
 
@@ -332,8 +313,8 @@ func (r *BindResponse) Decode(enc []byte) error {
 		var p int
 		if p, err = r.LDAPResult.setComponentsOf(payload); err == nil {
 			var res []byte
-			res, err = asn1.UnwrapTLV(payload[p:],
-				aTag(asn1.ClassContextSpecific, false,
+			res, err = unwrapTLV(payload[p:],
+				aTag(classC, false,
 					uint32(TagBindResponseServerSaslCreds)))
 
 			if err == nil {
@@ -364,9 +345,6 @@ func (_ UnbindRequest) isRequestOp()   {}
 func (_ UnbindRequest) Kind() string   { return `request` }
 func (_ UnbindRequest) Choice() string { return nameUnbindRequestChoice }
 func (_ UnbindRequest) Tag() int       { return TagUnbindRequest }
-func (_ UnbindRequest) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, false, uint32(TagUnbindRequest))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following an
@@ -374,8 +352,8 @@ attempt to encode the contents of the receiver instance as an
 [APPLICATION 2] NULL context.
 */
 func (r UnbindRequest) Encode() ([]byte, error) {
-	enc, _ := Null(r).Encode()             // UNIVERSAL NULL
-	return asn1.WrapTLV(enc, r.classTag()) // [APPLICATION 2]
+	enc, _ := Null(r).Encode()        // UNIVERSAL NULL
+	return wrapTLV(enc, r.classTag()) // [APPLICATION 2]
 }
 
 /*
@@ -385,7 +363,7 @@ truncated, and must bear the [APPLICATION 2] NULL tag.
 */
 func (r UnbindRequest) Decode(enc []byte) error {
 	var err error
-	enc, err = asn1.UnwrapTLV(enc, r.classTag()) // [APPLICATION 2]
+	enc, err = unwrapTLV(enc, r.classTag()) // [APPLICATION 2]
 	if err == nil {
 		err = checkNullEncoding(enc) // UNIVERSAL NULL
 	}

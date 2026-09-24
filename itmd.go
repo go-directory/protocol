@@ -1,9 +1,5 @@
 package protocol
 
-import (
-	"github.com/go-directory/encoding/asn1"
-)
-
 /*
 	IntermediateResponse ::= [APPLICATION 25] SEQUENCE {
 	     responseName     [0] LDAPOID OPTIONAL,
@@ -21,11 +17,8 @@ type IntermediateResponse struct {
 func (_ IntermediateResponse) Kind() string   { return `response` }
 func (_ IntermediateResponse) Choice() string { return nameIntermediateResponseChoice }
 func (_ IntermediateResponse) Tag() int       { return TagIntermediateResponse }
-func (_ IntermediateResponse) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagIntermediateResponse))
-}
-func (_ IntermediateResponse) isProtocolOp() {}
-func (_ IntermediateResponse) isResponseOp() {}
+func (_ IntermediateResponse) isProtocolOp()  {}
+func (_ IntermediateResponse) isResponseOp()  {}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -39,8 +32,8 @@ func (r IntermediateResponse) Encode() ([]byte, error) {
 		var cmpnt []byte
 		cmpnt, err = r.ResponseName.Encode()
 		if err == nil {
-			cmpnt, err = asn1.WrapTLV(cmpnt,
-				aTag(asn1.ClassContextSpecific, false,
+			cmpnt, err = wrapTLV(cmpnt,
+				aTag(classC, false,
 					uint32(TagIntermediateResponseName)))
 			if err == nil {
 				enc = append(enc, cmpnt...)
@@ -52,8 +45,8 @@ func (r IntermediateResponse) Encode() ([]byte, error) {
 		var cmpnt []byte
 		cmpnt, err = r.ResponseValue.Encode()
 		if err == nil {
-			cmpnt, err = asn1.WrapTLV(cmpnt,
-				aTag(asn1.ClassContextSpecific, false,
+			cmpnt, err = wrapTLV(cmpnt,
+				aTag(classC, false,
 					uint32(TagIntermediateResponseValue)))
 			if err == nil {
 				enc = append(enc, cmpnt...)
@@ -62,7 +55,7 @@ func (r IntermediateResponse) Encode() ([]byte, error) {
 	}
 
 	if err == nil {
-		enc, err = asn1.WrapTLV(enc,
+		enc, err = wrapTLV(enc,
 			uSeqTag(),    // SEQUENCE
 			r.classTag()) // [APPLICATION 23]
 	}
@@ -75,7 +68,7 @@ Decode returns an error following an attempt to decode and write the
 input encoding to the receiver instance
 */
 func (r *IntermediateResponse) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc,
+	payload, err := unwrapTLV(enc,
 		r.classTag(), // [APPLICATION 23]
 		uSeqTag())    // SEQUENCE
 
@@ -84,8 +77,8 @@ func (r *IntermediateResponse) Decode(enc []byte) error {
 		p := 0
 		for p < len(payload) && ct < 2 && err == nil {
 			var val []byte
-			val, err = asn1.ReadExpectedPrimitiveTLV(payload,
-				&p, asn1.ClassContextSpecific, uint32(ct))
+			val, err = readEPTLV(payload,
+				&p, classC, uint32(ct))
 
 			if err == nil {
 				if ct == TagIntermediateResponseName {

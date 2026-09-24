@@ -1,9 +1,5 @@
 package protocol
 
-import (
-	"github.com/go-directory/encoding/asn1"
-)
-
 /*
 	CompareRequest ::= [APPLICATION 14] SEQUENCE {
 	     entry           LDAPDN,
@@ -21,11 +17,8 @@ type CompareRequest struct {
 func (_ CompareRequest) Kind() string   { return `request` }
 func (_ CompareRequest) Choice() string { return nameCompareRequestChoice }
 func (_ CompareRequest) Tag() int       { return TagCompareRequest }
-func (_ CompareRequest) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagCompareRequest))
-}
-func (_ CompareRequest) isProtocolOp() {}
-func (_ CompareRequest) isRequestOp()  {}
+func (_ CompareRequest) isProtocolOp()  {}
+func (_ CompareRequest) isRequestOp()   {}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -38,7 +31,7 @@ func (r CompareRequest) Encode() ([]byte, error) {
 	if err == nil {
 		var attrs []byte
 		if attrs, err = r.AVA.Encode(); err == nil {
-			outer, err = asn1.WrapTLV(append(ldn, attrs...),
+			outer, err = wrapTLV(append(ldn, attrs...),
 				uSeqTag(),    // SEQUENCE
 				r.classTag()) // [APPLICATION 14]
 		}
@@ -53,15 +46,14 @@ the input encoding to the receiver instance. The encoding must
 not be truncated, and must bear the [APPLICATION 14] SEQUENCE tag.
 */
 func (r *CompareRequest) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc,
+	payload, err := unwrapTLV(enc,
 		r.classTag(), // [APPLICATION 14]
 		uSeqTag())    // SEQUENCE
 
 	if err == nil {
 		p := 0
 		var dnPayload []byte
-		dnPayload, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-			asn1.ClassUniversal, uint32(asn1.TagOctetString))
+		dnPayload, err = readEPTLV(payload, &p, classU, uint32(tOct))
 
 		if err == nil {
 			r.Entry = dnPayload
@@ -89,11 +81,8 @@ type CompareResponse LDAPResult
 func (_ CompareResponse) Kind() string   { return `response` }
 func (_ CompareResponse) Choice() string { return nameCompareResponseChoice }
 func (_ CompareResponse) Tag() int       { return TagCompareResponse }
-func (_ CompareResponse) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagCompareResponse))
-}
-func (_ CompareResponse) isProtocolOp() {}
-func (_ CompareResponse) isResponseOp() {}
+func (_ CompareResponse) isProtocolOp()  {}
+func (_ CompareResponse) isResponseOp()  {}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -104,7 +93,7 @@ func (r CompareResponse) Encode() ([]byte, error) {
 	var enc []byte
 	res, err := LDAPResult(r).Encode() // LDAPResult SEQUENCE
 	if err == nil {
-		enc, err = asn1.WrapTLV(res, r.classTag()) // [APPLICATION 15]
+		enc, err = wrapTLV(res, r.classTag()) // [APPLICATION 15]
 	}
 
 	return enc, err
@@ -117,7 +106,7 @@ truncated, and must bear the [APPLICATION 15] tag, circumscribing
 an [LDAPResult] SEQUENCE.
 */
 func (r *CompareResponse) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, r.classTag()) // [APPLICATION 15]
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 15]
 	if err == nil {
 		var dec LDAPResult
 		if err = dec.Decode(payload); err == nil { // LDAPResult SEQUENCE

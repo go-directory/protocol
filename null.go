@@ -1,17 +1,12 @@
 package protocol
 
-import (
-	"github.com/go-directory/encoding/asn1"
-)
-
 /*
 Null implements the ASN.1 NULL type, which serves as the base type
 of [UnbindRequest].
 */
 type Null struct{}
 
-func (_ Null) Tag() int                 { return int(asn1.TagNull) }
-func (_ Null) classTag() asn1.Tag       { return aTag(asn1.ClassUniversal, false, uint32(asn1.TagNull)) }
+func (_ Null) Tag() int                 { return int(tNull) }
 func (_ Null) Encode() ([]byte, error)  { return []byte{0x5, 0x0}, nil }
 func (_ *Null) Decode(enc []byte) error { return checkNullEncoding(enc) }
 

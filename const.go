@@ -38,6 +38,9 @@ const (
 	TagIntermediateResponse         // 25
 )
 
+/*
+Extended Request and Response tags.
+*/
 const (
 	TagExtendedRequestName   = 0
 	TagExtendedRequestValue  = 1
@@ -45,31 +48,56 @@ const (
 	TagExtendedResponseValue = 11
 )
 
-const TagIntermediateResponseName = 0
-const TagIntermediateResponseValue = 1
+/*
+Intermediate Response tags.
+*/
+const (
+	TagIntermediateResponseName  = 0
+	TagIntermediateResponseValue = 1
+)
 
-const TagAuthenticationChoiceSimple = 0
-const TagAuthenticationChoiceSaslCredentials = 3
+/*
+Authentication Choice tags.
+*/
+const (
+	TagAuthenticationChoiceSimple          = 0
+	TagAuthenticationChoiceSaslCredentials = 3
+)
 
 const TagModifyDNRequestNewSuperior = 0
 
 const TagBindResponseServerSaslCreds = 7
 
-const modifyRequestChangeOperationAdd = 0
-const modifyRequestChangeOperationDelete = 1
-const modifyRequestChangeOperationReplace = 2
+/*
+Modify Change Operation tags.
+*/
+const (
+	ModifyRequestChangeOperationAdd     Enumerated = iota // 0
+	ModifyRequestChangeOperationDelete                    // 1
+	ModifyRequestChangeOperationReplace                   // 2
+)
 
 var enumeratedModifyRequestChangeOperation = map[Enumerated]string{
-	modifyRequestChangeOperationAdd:     "add",
-	modifyRequestChangeOperationDelete:  "delete",
-	modifyRequestChangeOperationReplace: "replace",
+	ModifyRequestChangeOperationAdd:     "add",
+	ModifyRequestChangeOperationDelete:  "delete",
+	ModifyRequestChangeOperationReplace: "replace",
 }
 
+/*
+Upper bounds (UB) definitions.
+*/
 const (
 	UBMessageID = MaxInt
 	UBSizeLimit = MaxInt
 	UBTimeLimit = MaxInt
 )
 
-// maxInt INTEGER ::= 2147483647
+/*
+	maxInt INTEGER ::= 2147483647
+
+MaxInt implements the 'maxInt' definition, per [§ 4.1.1 of RFC4511], which spans
+the unsigned half of int32.
+
+[§ 4.1.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.1.1
+*/
 const MaxInt = 2147483647

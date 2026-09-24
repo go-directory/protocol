@@ -101,7 +101,7 @@ func (r MessageID) Encode() ([]byte, error) {
 	if int32(r) < 0 {
 		return nil, errMsgIDOOB
 	}
-	enc := asn1.EncodeInteger[int64](int64(r))
+	enc := encInt[int64](int64(r))
 	return enc, nil
 }
 
@@ -111,7 +111,7 @@ input encoding to the receiver instance. The encoding must not be
 truncated and must bear the ASN.1 INTEGER tag (0x02).
 */
 func (r *MessageID) Decode(enc []byte) error {
-	dec, err := asn1.DecodeInteger[int64](enc)
+	dec, err := decInt[int64](enc)
 	if err == nil {
 		if !(0 <= dec && dec <= UBMessageID) {
 			return errMsgIDOOB
@@ -181,7 +181,7 @@ an attempt to encode the contents of the receiver as a SEQUENCE.
 func (r LDAPMessage) Encode() ([]byte, error) {
 	var enc []byte
 
-	mid := asn1.EncodeInteger[uint](uint(r.MessageID))
+	mid := encInt[uint](uint(r.MessageID))
 	enc = append(enc, mid...)
 	pop, err := r.ProtocolOp.Encode()
 	if err == nil {
@@ -190,9 +190,7 @@ func (r LDAPMessage) Encode() ([]byte, error) {
 			var ctrl []byte
 			if ctrl, err = r.Controls.Encode(); err == nil {
 				var wrap []byte
-				wrap, err = asn1.WrapTLV(ctrl,
-					aTag(asn1.ClassContextSpecific,
-						true, uint32(0)))
+				wrap, err = wrapTLV(ctrl, aTag(classC, true, uint32(0)))
 
 				if err == nil {
 					enc = append(enc, wrap...)
@@ -200,7 +198,7 @@ func (r LDAPMessage) Encode() ([]byte, error) {
 			}
 		}
 		if err == nil {
-			enc, err = asn1.WrapTLV(enc, uSeqTag())
+			enc, err = wrapTLV(enc, uSeqTag())
 		}
 	}
 
@@ -213,25 +211,23 @@ input encoding value to the receiver instance. The encoding must not
 be truncated and must bear the SEQUENCE (0x10) tag.
 */
 func (r *LDAPMessage) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, uSeqTag())
+	payload, err := unwrapTLV(enc, uSeqTag())
 	if err == nil {
 		p := 0
-		_, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-			asn1.ClassUniversal, uint32(asn1.TagInteger))
+		_, err = readEPTLV(payload, &p, classU, uint32(tInt))
 		if err == nil {
-			var uu uint
-			if uu, err = asn1.DecodeInteger[uint](payload[:p]); err == nil {
+			var uu int64
+			if uu, err = decInt[int64](payload[:p]); err == nil {
 				r.MessageID = MessageID(uu)
 				rest := payload[p:]
 				if err == nil {
 					p = 0
-					tag, _, _ := asn1.ReadConstructedTLV(rest, &p)
+					tag, _, _ := readCTLV(rest, &p)
 					r.ProtocolOp, err = readProtocolOp(tag, rest[:p])
 					if err == nil && len(rest) > p {
 						var unwrap []byte
-						unwrap, err = asn1.UnwrapTLV(rest[p:],
-							aTag(asn1.ClassContextSpecific,
-								true, uint32(0)))
+						unwrap, err = unwrapTLV(rest[p:],
+							aTag(classC, true, uint32(0)))
 
 						if err == nil {
 							var dec Controls
@@ -347,7 +343,7 @@ func readResponseOp(tag asn1.Tag, payload []byte) (ret ProtocolOp, err error) {
 }
 
 func readProtocolOp(tag asn1.Tag, payload []byte) (ret ProtocolOp, err error) {
-	if tag.Class != asn1.ClassApplication {
+	if tag.Class != classA {
 		err = protocolError("class mismatch; want 2, got ", itoa(int(tag.Class)))
 		return
 	}

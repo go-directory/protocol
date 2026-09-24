@@ -53,3 +53,9 @@ var NewLDAPDN = syntax.NewLDAPDN
 var NewLDAPOID = syntax.NewLDAPOID
 
 var NewFilter = syntax.NewFilter
+
+/*
+Text is a convenience type meant to work in situations
+where either a string or []byte is acceptable for input.
+*/
+type Text interface{ ~string | ~[]byte }

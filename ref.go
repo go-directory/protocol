@@ -1,9 +1,5 @@
 package protocol
 
-import (
-	"github.com/go-directory/encoding/asn1"
-)
-
 /*
 	Referral ::= SEQUENCE SIZE (1..MAX) OF uri URI
 
@@ -16,10 +12,7 @@ type Referral []URI
 /*
 Tag returns 0x10 (16) for SEQUENCE OF.
 */
-func (_ Referral) Tag() int { return int(asn1.TagSequence) }
-func (_ Referral) classTag() asn1.Tag {
-	return aTag(asn1.ClassUniversal, true, uint32(asn1.TagSequence))
-}
+func (_ Referral) Tag() int { return int(tSeq) }
 
 func (r Referral) Encode() ([]byte, error) {
 	// Create slice of encoded URIs
@@ -33,20 +26,20 @@ func (r Referral) Encode() ([]byte, error) {
 
 	if err == nil {
 		// Wrap as a SEQUENCE OF URI
-		enc, err = asn1.WrapTLV(enc, uSeqTag())
+		enc, err = wrapTLV(enc, uSeqTag())
 	}
 
 	return enc, err
 }
 
 func (r *Referral) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, uSeqTag())
+	payload, err := unwrapTLV(enc, uSeqTag())
 	if err == nil {
 		p := 0
 		for p < len(payload) && err == nil {
 			var uriVal []byte
-			uriVal, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-				asn1.ClassUniversal, uint32(asn1.TagOctetString))
+			uriVal, err = readEPTLV(payload, &p,
+				classU, uint32(tOct))
 
 			if err == nil {
 				*r = append(*r, URI(uriVal))

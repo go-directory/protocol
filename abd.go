@@ -1,9 +1,5 @@
 package protocol
 
-import (
-	"github.com/go-directory/encoding/asn1"
-)
-
 /*
 	AbandonRequest ::= [APPLICATION 16] MessageID
 
@@ -29,9 +25,7 @@ an attempt to encode the contents of the receiver instance as an
 func (r AbandonRequest) Encode() ([]byte, error) {
 	enc, err := MessageID(r).Encode()
 	if err == nil {
-		enc, err = asn1.WrapTLV(enc,
-			aTag(asn1.ClassApplication,
-				false, uint32(r.Tag())))
+		enc, err = wrapTLV(enc, r.classTag())
 	}
 
 	return enc, err
@@ -44,10 +38,7 @@ be truncated and must bear a tag of [APPLICATION 16].
 */
 func (r *AbandonRequest) Decode(enc []byte) error {
 	var err error
-	enc, err = asn1.UnwrapTLV(enc,
-		aTag(asn1.ClassApplication,
-			false, uint32(r.Tag())))
-
+	enc, err = unwrapTLV(enc, r.classTag())
 	if err == nil {
 		var dec MessageID
 		if err = dec.Decode(enc); err == nil {

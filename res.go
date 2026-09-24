@@ -2,7 +2,6 @@ package protocol
 
 import (
 	"github.com/go-directory/common"
-	"github.com/go-directory/encoding/asn1"
 )
 
 /*
@@ -92,8 +91,8 @@ func (r LDAPResult) Encode() ([]byte, error) {
 					refs, err = r.Referral.Encode() // SEQUENCE OF
 					if err == nil {
 						// Wrap as a CONTEXT-SPECIFIC [3]
-						refs, err = asn1.WrapTLV(refs,
-							aTag(asn1.ClassContextSpecific,
+						refs, err = wrapTLV(refs,
+							aTag(classC,
 								true, uint32(3)))
 
 						if err == nil {
@@ -104,7 +103,7 @@ func (r LDAPResult) Encode() ([]byte, error) {
 
 				if err == nil {
 					// Wrap entire payload as SEQUENCE
-					out, err = asn1.WrapTLV(payload, uSeqTag())
+					out, err = wrapTLV(payload, uSeqTag())
 				}
 			}
 		}
@@ -118,8 +117,8 @@ func (r LDAPResult) Encode() ([]byte, error) {
 // decode procedure.
 func (r *LDAPResult) setComponentsOf(payload []byte) (p int, err error) {
 	// resultCode (ENUMERATED)
-	_, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-		asn1.ClassUniversal, uint32(asn1.TagEnumerated))
+	_, err = readEPTLV(payload, &p,
+		classU, uint32(tEnum))
 	if err != nil {
 		return p, err
 	}
@@ -129,15 +128,15 @@ func (r *LDAPResult) setComponentsOf(payload []byte) (p int, err error) {
 	}
 
 	// matchedDN (OCTET STRING)
-	r.MatchedDN, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-		asn1.ClassUniversal, uint32(asn1.TagOctetString))
+	r.MatchedDN, err = readEPTLV(payload, &p,
+		classU, uint32(tOct))
 	if err != nil {
 		return p, err
 	}
 
 	// diagnosticMessage (OCTET STRING)
-	r.DiagnosticMessage, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-		asn1.ClassUniversal, uint32(asn1.TagOctetString))
+	r.DiagnosticMessage, err = readEPTLV(payload, &p,
+		classU, uint32(tOct))
 	if err != nil {
 		return p, err
 	}
@@ -147,8 +146,8 @@ func (r *LDAPResult) setComponentsOf(payload []byte) (p int, err error) {
 		return p, nil
 	}
 
-	tag, _ := asn1.ReadTag(payload[p:])
-	if tag.Class == asn1.ClassContextSpecific && tag.Tag == 3 {
+	tag, _ := readTag(payload[p:])
+	if tag.Class == classC && tag.Tag == 3 {
 		tlvLen := func(b []byte) (int, error) {
 			if len(b) < 2 {
 				return 0, protocolError("ExtendedResponse: short TLV")
@@ -182,7 +181,7 @@ func (r *LDAPResult) setComponentsOf(payload []byte) (p int, err error) {
 
 		var refSeq []byte
 		// Unwrap CONTEXT-SPECIFIC [3]
-		if refSeq, err = asn1.UnwrapTLV(payload[p:], tag); err == nil {
+		if refSeq, err = unwrapTLV(payload[p:], tag); err == nil {
 			// Unwrap the outer SEQUENCE wrapping,
 			// and decode the individual LDAPString
 			// (URI) slices.
@@ -197,7 +196,7 @@ func (r *LDAPResult) setComponentsOf(payload []byte) (p int, err error) {
 }
 
 func (r *LDAPResult) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, uSeqTag())
+	payload, err := unwrapTLV(enc, uSeqTag())
 	if err == nil {
 		_, err = r.setComponentsOf(payload)
 	}

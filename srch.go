@@ -1,11 +1,5 @@
 package protocol
 
-import (
-	"fmt"
-
-	"github.com/go-directory/encoding/asn1"
-)
-
 /*
 	scope ::= ENUMERATED {
 	    baseObject       (0),
@@ -78,9 +72,6 @@ type SearchRequest struct {
 func (_ SearchRequest) Kind() string   { return `request` }
 func (_ SearchRequest) Choice() string { return nameSearchRequestChoice }
 func (_ SearchRequest) Tag() int       { return TagSearchRequest }
-func (_ SearchRequest) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagSearchRequest))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -117,7 +108,7 @@ func (r SearchRequest) Encode() ([]byte, error) {
 			}
 
 			if err == nil {
-				enc, err = asn1.WrapTLV(enc,
+				enc, err = wrapTLV(enc,
 					uSeqTag(),    // SEQUENCE
 					r.classTag()) // [APPLICATION 3]
 			}
@@ -133,7 +124,7 @@ the input encoding to the receiver instance. The encoding must
 not be truncated, and must bear the [APPLICATION 3] SEQUENCE tag.
 */
 func (r *SearchRequest) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc,
+	payload, err := unwrapTLV(enc,
 		r.classTag(), // [APPLICATION 3]
 		uSeqTag())    // SEQUENCE
 
@@ -163,8 +154,8 @@ func (r *SearchRequest) Decode(enc []byte) error {
 func (r *SearchRequest) decodeBase(c *int, payload []byte) (err error) {
 	var val []byte
 
-	val, err = asn1.ReadExpectedPrimitiveTLV(payload, c,
-		asn1.ClassUniversal, uint32(asn1.TagOctetString))
+	val, err = readEPTLV(payload, c,
+		classU, uint32(tOct))
 
 	if err == nil {
 		r.BaseObject = LDAPDN(val)
@@ -176,8 +167,8 @@ func (r *SearchRequest) decodeBase(c *int, payload []byte) (err error) {
 func (r *SearchRequest) decodeScope(c *int, payload []byte) (err error) {
 	p2 := 0
 	p := *c
-	_, err = asn1.ReadExpectedPrimitiveTLV(payload[p:], &p2,
-		asn1.ClassUniversal, uint32(asn1.TagEnumerated))
+	_, err = readEPTLV(payload[p:], &p2,
+		classU, uint32(tEnum))
 
 	if err == nil {
 		p2 += p
@@ -191,8 +182,8 @@ func (r *SearchRequest) decodeScope(c *int, payload []byte) (err error) {
 func (r *SearchRequest) decodeDeref(c *int, payload []byte) (err error) {
 	p2 := 0
 	p := *c
-	_, err = asn1.ReadExpectedPrimitiveTLV(payload[p:], &p2,
-		asn1.ClassUniversal, uint32(asn1.TagEnumerated))
+	_, err = readEPTLV(payload[p:], &p2,
+		classU, uint32(tEnum))
 
 	if err == nil {
 		p2 += p
@@ -206,8 +197,8 @@ func (r *SearchRequest) decodeDeref(c *int, payload []byte) (err error) {
 func (r *SearchRequest) decodeSizeLimit(c *int, payload []byte) (err error) {
 	p2 := 0
 	p := *c
-	_, err = asn1.ReadExpectedPrimitiveTLV(payload[p:], &p2,
-		asn1.ClassUniversal, uint32(asn1.TagInteger))
+	_, err = readEPTLV(payload[p:], &p2,
+		classU, uint32(tInt))
 
 	if err == nil {
 		p2 += p
@@ -219,16 +210,14 @@ func (r *SearchRequest) decodeSizeLimit(c *int, payload []byte) (err error) {
 }
 
 func (r *SearchRequest) decodeTimeLimit(c *int, payload []byte) (err error) {
-	if tag, _ := asn1.ReadTag(payload); tag.Tag != uint32(asn1.TagInteger) {
+	if tag, _ := readTag(payload); tag.Tag != uint32(tInt) {
 		return
 	}
 
 	p2 := 0
 	p := *c
-	_, err = asn1.ReadExpectedPrimitiveTLV(payload[p:], &p2,
-		asn1.ClassUniversal, uint32(asn1.TagInteger))
-
-	_ = fmt.Sprintf("")
+	_, err = readEPTLV(payload[p:], &p2,
+		classU, uint32(tInt))
 
 	if err == nil {
 		p2 += p
@@ -242,8 +231,8 @@ func (r *SearchRequest) decodeTimeLimit(c *int, payload []byte) (err error) {
 func (r *SearchRequest) decodeTypesOnly(c *int, payload []byte) (err error) {
 	p2 := 0
 	p := *c
-	_, err = asn1.ReadExpectedPrimitiveTLV(payload[p:], &p2,
-		asn1.ClassUniversal, uint32(asn1.TagBoolean))
+	_, err = readEPTLV(payload[p:], &p2,
+		classU, uint32(tBool))
 
 	if err == nil {
 		p2 += p
@@ -261,14 +250,14 @@ func (r *SearchRequest) decodeFilter(c *int, payload []byte) (err error) {
 	// Unlike previous components of this type, filter
 	// can start with any one of ten possible tags, so
 	// we can't rely on targeting any specific one.
-	tag, _ := asn1.ReadTag(payload[p:])
+	tag, _ := readTag(payload[p:])
 	if !(0 <= tag.Tag && tag.Tag <= 9) {
 		// not a filter ...
 		return
 	}
 
-	_, err = asn1.ReadExpectedConstructedTLV(payload[p:], &p2,
-		asn1.ClassContextSpecific, tag.Tag)
+	_, err = readECTLV(payload[p:], &p2,
+		classC, tag.Tag)
 
 	if err == nil {
 		p2 += p
@@ -283,15 +272,15 @@ func (r *SearchRequest) decodeAttributes(c *int, payload []byte) (err error) {
 	p2 := 0
 	p := *c
 
-	seqTag := uint32(asn1.TagSequence) // SEQUENCE *OF*
-	tag, _ := asn1.ReadTag(payload[p:])
+	seqTag := uint32(tSeq) // SEQUENCE *OF*
+	tag, _ := readTag(payload[p:])
 	if tag.Tag != seqTag {
 		// not a SEQUENCE OF LDAPString ...
 		return
 	}
 
-	_, err = asn1.ReadExpectedConstructedTLV(payload[p:], &p2,
-		asn1.ClassUniversal, seqTag)
+	_, err = readECTLV(payload[p:], &p2,
+		classU, seqTag)
 
 	if err == nil {
 		p2 += p
@@ -379,9 +368,6 @@ func (_ SearchResultEntry) Choice() string { return nameSearchResultEntryChoice 
 func (_ SearchResultEntry) isProtocolOp()  {}
 func (_ SearchResultEntry) isResponseOp()  {}
 func (_ SearchResultEntry) Tag() int       { return TagSearchResultEntry }
-func (_ SearchResultEntry) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagSearchResultEntry))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -397,7 +383,7 @@ func (r SearchResultEntry) Encode() ([]byte, error) {
 		attrs, err = r.Attributes.Encode()
 		if err == nil {
 			enc = append(enc, attrs...)
-			enc, err = asn1.WrapTLV(enc,
+			enc, err = wrapTLV(enc,
 				uSeqTag(),    // SEQUENCE
 				r.classTag()) // [APPLICATION 4]
 		}
@@ -412,15 +398,15 @@ the input encoding to the receiver instance. The encoding must
 not be truncated, and must bear the [APPLICATION 4] SEQUENCE tag.
 */
 func (r *SearchResultEntry) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc,
+	payload, err := unwrapTLV(enc,
 		r.classTag(), // [APPLICATION 4]
 		uSeqTag())    // SEQUENCE
 
 	if err == nil {
 		p := 0
 		var name []byte
-		name, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-			asn1.ClassUniversal, uint32(asn1.TagOctetString))
+		name, err = readEPTLV(payload, &p,
+			classU, uint32(tOct))
 
 		if err == nil {
 			r.ObjectName = LDAPDN(name)
@@ -445,9 +431,6 @@ func (_ SearchResultReference) Choice() string { return nameSearchResultReferenc
 func (_ SearchResultReference) isProtocolOp()  {}
 func (_ SearchResultReference) isResponseOp()  {}
 func (_ SearchResultReference) Tag() int       { return TagSearchResultReference }
-func (_ SearchResultReference) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagSearchResultReference))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -460,7 +443,7 @@ given that [Referral] is a [][URI] like [SearchResultReference].
 func (r SearchResultReference) Encode() ([]byte, error) {
 	enc, err := Referral(r).Encode() // SEQUENCE OF URI
 	if err == nil {
-		enc, err = asn1.WrapTLV(enc, r.classTag()) // [APPLICATION 19]
+		enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 19]
 	}
 
 	return enc, err
@@ -472,7 +455,7 @@ input encoding to the receiver instance. The encoding must not be
 truncated, and must bear the [APPLICATION 19] SEQUENCE OF tag.
 */
 func (r *SearchResultReference) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, r.classTag()) // [APPLICATION 19]
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 19]
 	if err == nil {
 		// Unwrap SEQUENCE OF for payload, then decode
 		// the individual LDAPString (URI) slices.
@@ -502,9 +485,6 @@ func (_ SearchResultDone) Choice() string { return nameSearchResultDoneChoice }
 func (_ SearchResultDone) isProtocolOp()  {}
 func (_ SearchResultDone) isResponseOp()  {}
 func (_ SearchResultDone) Tag() int       { return TagSearchResultDone }
-func (_ SearchResultDone) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagSearchResultDone))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -514,7 +494,7 @@ an attempt to encode the contents of the receiver instance as an
 func (r SearchResultDone) Encode() ([]byte, error) {
 	enc, err := LDAPResult(r).Encode() // SEQUENCE
 	if err == nil {
-		enc, err = asn1.WrapTLV(enc, r.classTag()) // [APPLICATION 5]
+		enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 5]
 	}
 
 	return enc, err
@@ -526,7 +506,7 @@ the input encoding to the receiver instance. The encoding must
 not be truncated, and must bear the [APPLICATION 5] SEQUENCE tag.
 */
 func (r *SearchResultDone) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, r.classTag()) // [APPLICATION 5]
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 5]
 	if err == nil {
 		var dec LDAPResult
 		if err = dec.Decode(payload); err == nil { // SEQUENCE

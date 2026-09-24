@@ -1,9 +1,5 @@
 package protocol
 
-import (
-	"github.com/go-directory/encoding/asn1"
-)
-
 /*
 	ModifyRequest ::= [APPLICATION 6] SEQUENCE {
 		object          LDAPDN,
@@ -51,9 +47,6 @@ func (_ ModifyRequest) isRequestOp()   {}
 func (_ ModifyRequest) Kind() string   { return `request` }
 func (_ ModifyRequest) Choice() string { return nameModifyRequestChoice }
 func (_ ModifyRequest) Tag() int       { return TagModifyRequest }
-func (_ ModifyRequest) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagModifyRequest))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -76,9 +69,9 @@ func (r ModifyRequest) Encode() ([]byte, error) {
 
 		if err == nil {
 			var seqOf []byte
-			if seqOf, err = asn1.WrapTLV(changes, uSeqTag()); err == nil {
+			if seqOf, err = wrapTLV(changes, uSeqTag()); err == nil {
 				payload = append(payload, seqOf...)
-				out, err = asn1.WrapTLV(payload, r.classTag()) // [APPLICATION 6]
+				out, err = wrapTLV(payload, r.classTag()) // [APPLICATION 6]
 			}
 		}
 	}
@@ -103,7 +96,7 @@ func (r ModifyRequestChange) Encode() ([]byte, error) {
 		if err == nil {
 			out = append(out, mod...)
 			// outer SEQUENCE wrapping
-			out, err = asn1.WrapTLV(out, uSeqTag())
+			out, err = wrapTLV(out, uSeqTag())
 		}
 	}
 
@@ -116,24 +109,24 @@ the input encoding to the receiver instance. The encoding must
 not be truncated, and must bear the [APPLICATION 6] SEQUENCE tag.
 */
 func (r *ModifyRequest) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, r.classTag()) // [APPLICATION 6]
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 6]
 
 	if err == nil {
 		p := 0
-		r.Object, err = asn1.ReadExpectedPrimitiveTLV(payload,
-			&p, asn1.ClassUniversal, uint32(asn1.TagOctetString))
+		r.Object, err = readEPTLV(payload,
+			&p, classU, uint32(tOct))
 
 		if err == nil {
 			p2 := 0
 			var chgs []byte
-			chgs, err = asn1.ReadExpectedConstructedTLV(payload[p:], &p2,
-				asn1.ClassUniversal, uint32(asn1.TagSequence))
+			chgs, err = readECTLV(payload[p:], &p2,
+				classU, uint32(tSeq))
 
 			p3 := 0
 			for p3 < len(chgs) && err == nil {
 				var chg []byte
-				chg, err = asn1.ReadExpectedConstructedTLV(chgs, &p3,
-					asn1.ClassUniversal, uint32(asn1.TagSequence))
+				chg, err = readECTLV(chgs, &p3,
+					classU, uint32(tSeq))
 				if err == nil {
 					var mrc ModifyRequestChange
 					if err = mrc.Decode(chg); err == nil {
@@ -153,26 +146,37 @@ the input encoding to the receiver instance. The encoding must
 not be truncated, and must bear the SEQUENCE tag.
 */
 func (r *ModifyRequestChange) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, uSeqTag())
+	payload, err := unwrapTLV(enc, uSeqTag())
 	if err == nil {
 		p := 0
-		_, err = asn1.ReadExpectedPrimitiveTLV(payload, &p,
-			asn1.ClassUniversal, uint32(asn1.TagEnumerated))
+		_, err = readEPTLV(payload, &p,
+			classU, uint32(tEnum))
 
 		if err == nil {
 			if err = r.Operation.Decode(payload[:p]); err == nil {
-				var chg []byte
-				chg, err = asn1.ReadExpectedConstructedTLV(payload, &p,
-					asn1.ClassUniversal, uint32(asn1.TagSequence))
+				if err = r.validOperation(); err == nil {
+					var chg []byte
+					chg, err = readECTLV(payload, &p,
+						classU, uint32(tSeq))
 
-				if err == nil {
-					err = r.Modification.Decode(chg)
+					if err == nil {
+						err = r.Modification.Decode(chg)
+					}
 				}
 			}
 		}
 	}
 
 	return err
+}
+
+func (r ModifyRequestChange) validOperation() (err error) {
+	if !(0 <= r.Operation && r.Operation <= 2) {
+		err = protocolError("ModifyRequestChange.Operation: invalid ENUMERATED value; want add(0), delete(1) or replace(2), got ",
+			itoa(int(r.Operation)))
+	}
+
+	return
 }
 
 /*
@@ -189,9 +193,6 @@ func (_ ModifyResponse) isResponseOp()  {}
 func (_ ModifyResponse) Kind() string   { return `response` }
 func (_ ModifyResponse) Choice() string { return nameModifyResponseChoice }
 func (_ ModifyResponse) Tag() int       { return TagModifyResponse }
-func (_ ModifyResponse) classTag() asn1.Tag {
-	return aTag(asn1.ClassApplication, true, uint32(TagModifyResponse))
-}
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -202,7 +203,7 @@ func (r ModifyResponse) Encode() ([]byte, error) {
 	var enc []byte
 	res, err := LDAPResult(r).Encode()
 	if err == nil {
-		enc, err = asn1.WrapTLV(res, r.classTag())
+		enc, err = wrapTLV(res, r.classTag())
 	}
 
 	return enc, err
@@ -214,7 +215,7 @@ input encoding to the receiver instance. The encoding must not be
 truncated, and must bear the [APPLICATION 7] tag.
 */
 func (r *ModifyResponse) Decode(enc []byte) error {
-	payload, err := asn1.UnwrapTLV(enc, r.classTag())
+	payload, err := unwrapTLV(enc, r.classTag())
 	if err == nil {
 		var dec LDAPResult
 		if err = dec.Decode(payload); err == nil {
