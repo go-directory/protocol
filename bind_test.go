@@ -36,12 +36,14 @@ func ExampleBindRequest_roundTripBER() {
 func ExampleBindResponse_roundTripBER() {
 	creds := OctetString(`someSecretString`)
 	res := BindResponse{
-		ResultCode:        Enumerated(66),                               //
-		MatchedDN:         LDAPDN("cn=Some Guy,ou=people,o=acme"),       //
-		DiagnosticMessage: LDAPString("A diagnostic message goes here"), // COMPONENTS OF LDAPResult
-		Referral: &Referral{ //
-			URI(`ldap:///something`),     //
-			URI(`ldap:///somethingElse`), //
+		LDAPResult: LDAPResult{
+			ResultCode:        Enumerated(66),                               //
+			MatchedDN:         LDAPDN("cn=Some Guy,ou=people,o=acme"),       //
+			DiagnosticMessage: LDAPString("A diagnostic message goes here"), // COMPONENTS OF LDAPResult
+			Referral: &Referral{ //
+				URI(`ldap:///something`),     //
+				URI(`ldap:///somethingElse`), //
+			},
 		},
 		ServerSaslCreds: &creds,
 	}
@@ -78,12 +80,14 @@ func ExampleBindResponse_roundTripBER() {
 func BenchmarkBindResponse(b *testing.B) {
 	creds := OctetString(`someSecretString`)
 	res := BindResponse{
-		ResultCode:        Enumerated(66),
-		MatchedDN:         LDAPDN("cn=Some Guy,ou=people,o=acme"),
-		DiagnosticMessage: LDAPString("A diagnostic message goes here"),
-		Referral: &Referral{
-			URI(`ldap:///something`),
-			URI(`ldap:///somethingElse`),
+		LDAPResult: LDAPResult{
+			ResultCode:        Enumerated(66),
+			MatchedDN:         LDAPDN("cn=Some Guy,ou=people,o=acme"),
+			DiagnosticMessage: LDAPString("A diagnostic message goes here"),
+			Referral: &Referral{
+				URI(`ldap:///something`),
+				URI(`ldap:///somethingElse`),
+			},
 		},
 		ServerSaslCreds: &creds,
 	}
