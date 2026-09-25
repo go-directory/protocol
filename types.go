@@ -20,6 +20,7 @@ type (
 	LDAPOID                 = syntax.LDAPOID
 	Boolean                 = syntax.Boolean
 	Integer                 = syntax.Integer
+	Attribute               = syntax.Attribute
 	LDAPString              = syntax.LDAPString
 	Enumerated              = syntax.Enumerated
 	OctetString             = syntax.OctetString
