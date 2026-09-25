@@ -8,5 +8,9 @@ github.com/go-directory/syntax v0.0.0-20260924080719-94863eddd728 h1:pzlhpe89g1D
 github.com/go-directory/syntax v0.0.0-20260924080719-94863eddd728/go.mod h1:JmUw3pDOO/zhtPbrRGdDPezLPDpQu0ntFXv+QtbmVVc=
 github.com/go-directory/syntax v0.0.0-20260925020648-cef951e788c0 h1:eRzCVVq5ozWvU/OrDKLXKH7WYnBWIWOnQqJ016owcU8=
 github.com/go-directory/syntax v0.0.0-20260925020648-cef951e788c0/go.mod h1:JmUw3pDOO/zhtPbrRGdDPezLPDpQu0ntFXv+QtbmVVc=
+github.com/go-directory/syntax v0.0.0-20260925034620-d925f96bd580 h1:uQgHVzKY7W2gbynoqob+Z0oicRQP0hLeBizkaLXckok=
+github.com/go-directory/syntax v0.0.0-20260925034620-d925f96bd580/go.mod h1:JmUw3pDOO/zhtPbrRGdDPezLPDpQu0ntFXv+QtbmVVc=
+github.com/go-directory/syntax v0.0.0-20260925070515-cde4344fbc4a h1:fwgGcUNb/dcrfiXKh8EbwWF/BoKX5njKQBf2fYn1Yfk=
+github.com/go-directory/syntax v0.0.0-20260925070515-cde4344fbc4a/go.mod h1:JmUw3pDOO/zhtPbrRGdDPezLPDpQu0ntFXv+QtbmVVc=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
