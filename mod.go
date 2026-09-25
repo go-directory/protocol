@@ -49,6 +49,68 @@ func (_ ModifyRequest) Choice() string { return nameModifyRequestChoice }
 func (_ ModifyRequest) Tag() int       { return TagModifyRequest }
 
 /*
+Add appends an "add changetype" directive to the receiver using the provided
+[AttributeDescription] and [AttributeValue] instances.
+
+At least one (1) [AttributeValue] is required.
+*/
+func (r *ModifyRequest) Add(at AttributeDescription, av ...AttributeValue) {
+	// only add/append types if we provided at least one value
+	if len(av) > 0 {
+		idx := r.IndexOf(at, ModifyRequestChangeOperationAdd)
+		if idx == -1 {
+			idx = r.allocateChange(at, ModifyRequestChangeOperationAdd)
+		}
+		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, av...)
+	}
+}
+
+/*
+Delete appends a "delete changetype" directive to the receiver using the provided
+[AttributeDescription] and (optional) [AttributeValue] instances.
+
+Providing no [AttributeValue] instances means that the receiving DSA will delete
+*ALL* values assigned to [AttributeDescription] from the entry in question, as
+opposed to only specific values.
+*/
+func (r *ModifyRequest) Delete(at AttributeDescription, av ...AttributeValue) {
+	idx := r.IndexOf(at, ModifyRequestChangeOperationDelete)
+	if idx == -1 {
+		idx = r.allocateChange(at, ModifyRequestChangeOperationDelete)
+	}
+
+	if len(av) > 0 {
+		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, av...)
+	}
+}
+
+/*
+Replace appends a "replace changetype" directive to the receiver using the provided
+[AttributeDescription] and [AttributeValue] instances.
+
+At least one (1) [AttributeValue] is required.
+*/
+func (r *ModifyRequest) Replace(at AttributeDescription, av ...AttributeValue) {
+	// only add/append types if we provided at least one value
+	if len(av) > 0 {
+		idx := r.IndexOf(at, ModifyRequestChangeOperationReplace)
+		if idx == -1 {
+			idx = r.allocateChange(at, ModifyRequestChangeOperationReplace)
+		}
+		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, av...)
+	}
+}
+
+func (r *ModifyRequest) allocateChange(at AttributeDescription, op Enumerated) (idx int) {
+	idx = len(r.Changes)
+	r.Changes = append(r.Changes, ModifyRequestChange{
+		Operation:    op,
+		Modification: PartialAttribute{Type: at},
+	})
+	return
+}
+
+/*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an
 [APPLICATION 6] SEQUENCE.
@@ -177,6 +239,25 @@ func (r ModifyRequestChange) validOperation() (err error) {
 	}
 
 	return
+}
+
+/*
+IndexOf returns the integer index occupied by the [ModifyRequestChange] instance bearing
+a [AttributeDescription] and [Enumerated] instance matching the provided input.  If not
+found, -1 is returned.
+
+Case-folding is not significant in the matching process.
+*/
+func (r ModifyRequest) IndexOf(at AttributeDescription, op Enumerated) int {
+	var idx int = -1
+	for i := 0; i < len(r.Changes) && idx == -1; i++ {
+		if r.Changes[i].Modification.Type.EqualFold(at) &&
+			r.Changes[i].Operation == op {
+			idx = i
+		}
+	}
+
+	return idx
 }
 
 /*

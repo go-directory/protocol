@@ -7,7 +7,8 @@ package protocol
 		deleteoldrdn    BOOLEAN,
 		newSuperior     [0] LDAPDN OPTIONAL }
 
-ModifyDNRequest implements [§ 4.9 of RFC4511].
+ModifyDNRequest implements [§ 4.9 of RFC4511]. Instances of this type can be
+assembled using the [RenameEntry], [MoveEntry] and [RenameAndMoveEntry] functions.
 
 [§ 4.9 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.9
 */
@@ -16,6 +17,78 @@ type ModifyDNRequest struct {
 	NewRDN       RelativeLDAPDN
 	DeleteOldRDN Boolean
 	NewSuperior  *LDAPDN
+}
+
+/*
+RenameEntry returns an instance of [ModifyDNRequest] with instructions to replace
+the current relative distinguished name with a new one. The current superior DN
+(the parent) remains unchanged.
+
+That is we can change this ...
+
+	cn=old,ou=people,o=acme
+
+... to something like this ...
+
+	uid=new,ou=people,o=acme
+
+The variadic 'delOldRDN' Boolean will instruct the DSA as to whether or not the
+old RDN value(s) should be deleted.
+*/
+func RenameEntry(dn LDAPDN, newRDN RelativeLDAPDN, delOldRDN ...Boolean) ModifyDNRequest {
+	return ModifyDNRequest{
+		Entry:        dn,
+		NewRDN:       newRDN,
+		DeleteOldRDN: Boolean(len(delOldRDN) > 0 && delOldRDN[0]),
+	}
+}
+
+/*
+MoveEntry returns an instance of [ModifyDNRequest] with instructions to relocate,
+not rename, the entry. The current relative distinguished name remains unchanged,
+only the superior (parent) DN changes.
+
+That is, we can change this ...
+
+	cn=same,ou=people,o=acme
+
+... to something like this ...
+
+	cn=same,ou=accounts,o=acme
+*/
+func MoveEntry(dn, newSuperior LDAPDN) ModifyDNRequest {
+	return ModifyDNRequest{
+		Entry:        dn,
+		NewRDN:       dn.RDN(),
+		DeleteOldRDN: false,
+		NewSuperior:  &newSuperior,
+	}
+}
+
+/*
+RenameAndMoveEntry returns an instance of [ModifyDNRequest] with instructions to
+both relocate and rename the entry. The current RDN will be replaced with the
+specified 'newRDN' value, and the current superior (parent) DN will be replaced
+with the specified 'newSuperior' DN.
+
+That is, we change this ...
+
+	cn=old,ou=people,o=acme
+
+... to something like this ...
+
+	uid=new,ou=accounts,o=acme
+
+The variadic 'delOldRDN' Boolean will instruct the DSA as to whether or not the
+old RDN value(s) should be deleted.
+*/
+func RenameAndMoveEntry(dn, newSuperior LDAPDN, newRDN RelativeLDAPDN, delOldRDN ...Boolean) ModifyDNRequest {
+	return ModifyDNRequest{
+		Entry:        dn,
+		NewRDN:       newRDN,
+		DeleteOldRDN: Boolean(len(delOldRDN) > 0 && delOldRDN[0]),
+		NewSuperior:  &newSuperior,
+	}
 }
 
 func (_ ModifyDNRequest) Kind() string   { return `request` }

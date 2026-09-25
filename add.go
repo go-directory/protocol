@@ -20,6 +20,17 @@ func (_ AddRequest) Kind() string   { return `request` }
 func (_ AddRequest) Choice() string { return nameAddRequestChoice }
 func (_ AddRequest) Tag() int       { return TagAddRequest }
 
+func (r *AddRequest) Attribute(at AttributeDescription, av []AttributeValue) {
+	idx := r.Attributes.IndexOf(at)
+	if idx == -1 {
+		idx = len(r.Attributes)
+		r.Attributes = append(r.Attributes, Attribute{Type: at})
+	}
+	r.Attributes[idx].Vals = append(r.Attributes[idx].Vals, av...)
+
+	return
+}
+
 func (r AddRequest) Encode() ([]byte, error) {
 	var outer []byte
 	ldn, err := r.Entry.Encode()

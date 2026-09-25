@@ -4,6 +4,23 @@ import (
 	"fmt"
 )
 
+func ExampleAddRequest_assembly() {
+	req := AddRequest{
+		Entry: LDAPDN(`uid=username,ou=accounts,o=acme`),
+	}
+
+	req.Attribute(AttributeDescription(`cn`), []AttributeValue{
+		AttributeValue(`Some Guy`),
+		AttributeValue(`Some Distinguished Guy`),
+	})
+
+	fmt.Printf("dn: %s\n", req.Entry)
+	fmt.Printf("cn: %s, %s\n", req.Attributes[0].Vals[0], req.Attributes[0].Vals[1])
+	// Output:
+	// dn: uid=username,ou=accounts,o=acme
+	// cn: Some Guy, Some Distinguished Guy
+}
+
 func ExampleAddRequest_roundTripBER() {
 	req := AddRequest{
 		Entry: LDAPDN(`uid=username,ou=accounts,o=acme`),
