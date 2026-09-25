@@ -4,5 +4,9 @@ github.com/go-directory/encoding v0.0.0-20260922012141-7f5d192f0fc1 h1:23BkQ8i4H
 github.com/go-directory/encoding v0.0.0-20260922012141-7f5d192f0fc1/go.mod h1:SK7qtKZ4th6D8O4x0cOgrYOOrkMyq9BmeFtiqrchmls=
 github.com/go-directory/syntax v0.0.0-20260919054622-344608c651d2 h1:eQxv8J8cNADvjm6xjuIWoZGan77118qn8y3sei0qRtg=
 github.com/go-directory/syntax v0.0.0-20260919054622-344608c651d2/go.mod h1:LqUKd80WqqnLN5wmM9509Fd9IFEdaZfdZ3+VXC9q+yY=
+github.com/go-directory/syntax v0.0.0-20260924080719-94863eddd728 h1:pzlhpe89g1DKbuybJgf1HItesUCWS2zPYpICw/zruMA=
+github.com/go-directory/syntax v0.0.0-20260924080719-94863eddd728/go.mod h1:JmUw3pDOO/zhtPbrRGdDPezLPDpQu0ntFXv+QtbmVVc=
+github.com/go-directory/syntax v0.0.0-20260925020648-cef951e788c0 h1:eRzCVVq5ozWvU/OrDKLXKH7WYnBWIWOnQqJ016owcU8=
+github.com/go-directory/syntax v0.0.0-20260925020648-cef951e788c0/go.mod h1:JmUw3pDOO/zhtPbrRGdDPezLPDpQu0ntFXv+QtbmVVc=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
