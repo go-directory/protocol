@@ -23,6 +23,7 @@ type (
 	LDAPString              = syntax.LDAPString
 	Enumerated              = syntax.Enumerated
 	OctetString             = syntax.OctetString
+	AttributeType           = syntax.AttributeType
 	AttributeList           = syntax.AttributeList
 	AttributeValue          = syntax.AttributeValue
 	AssertionValue          = syntax.AssertionValue
@@ -35,14 +36,14 @@ type (
 )
 
 /*
-DefaultFilter represents the official default [Filter], "(objectClass=*)".
+defaultFilter represents the official default [Filter], "(objectClass=*)".
 */
-var DefaultFilter = syntax.DefaultFilter
+var defaultFilter = syntax.DefaultFilter
 
 /*
-FilterDecode is a top-level [Filter] decompiler.
+filterDecode is a top-level [Filter] decompiler.
 */
-var FilterDecode = syntax.FilterDecode
+var filterDecode = syntax.FilterDecode
 
 func NewInteger(x any) (Integer, error) {
 	i, err := syntax.NewInteger(x)
@@ -59,3 +60,5 @@ Text is a convenience type meant to work in situations
 where either a string or []byte is acceptable for input.
 */
 type Text interface{ ~string | ~[]byte }
+
+type EntryAttribute syntax.PartialAttribute
