@@ -2,6 +2,12 @@ github.com/go-directory/common v0.0.0-20260914190422-b244c6ff2f87 h1:mI0cP7q6AoQ
 github.com/go-directory/common v0.0.0-20260914190422-b244c6ff2f87/go.mod h1:38wymd8zkOxcZC/oRKK8a82xopDQRSz42XTd97NKgqg=
 github.com/go-directory/encoding v0.0.0-20260922012141-7f5d192f0fc1 h1:23BkQ8i4HOYFKzAhNBQgSnsToDF4Mdt7T/VIz4kxNZ0=
 github.com/go-directory/encoding v0.0.0-20260922012141-7f5d192f0fc1/go.mod h1:SK7qtKZ4th6D8O4x0cOgrYOOrkMyq9BmeFtiqrchmls=
+github.com/go-directory/encoding v0.0.0-20260925230032-dc7493f3e5e0 h1:8XRezVbPm6Ipyc3nAOKwkI8vgpKvF2+Ch40JowWZ6eM=
+github.com/go-directory/encoding v0.0.0-20260925230032-dc7493f3e5e0/go.mod h1:SK7qtKZ4th6D8O4x0cOgrYOOrkMyq9BmeFtiqrchmls=
+github.com/go-directory/encoding v0.0.0-20260925231642-eb08bc7b8b30 h1:taVXiwIMtyPBjJ0VIfl5L859XRoVFjUXsWWi6gwHfMs=
+github.com/go-directory/encoding v0.0.0-20260925231642-eb08bc7b8b30/go.mod h1:SK7qtKZ4th6D8O4x0cOgrYOOrkMyq9BmeFtiqrchmls=
+github.com/go-directory/encoding v0.0.0-20260926051027-f375ab88a1d8 h1:aS2kvzplsavtNJ7cddAwjaSXfqg4/zZ/4eNxw2wLjA4=
+github.com/go-directory/encoding v0.0.0-20260926051027-f375ab88a1d8/go.mod h1:hXA7SVwPJnT/cFg4JYVc9Vshgb1o6N7RThCS+iKeo+Q=
 github.com/go-directory/syntax v0.0.0-20260919054622-344608c651d2 h1:eQxv8J8cNADvjm6xjuIWoZGan77118qn8y3sei0qRtg=
 github.com/go-directory/syntax v0.0.0-20260919054622-344608c651d2/go.mod h1:LqUKd80WqqnLN5wmM9509Fd9IFEdaZfdZ3+VXC9q+yY=
 github.com/go-directory/syntax v0.0.0-20260924080719-94863eddd728 h1:pzlhpe89g1DKbuybJgf1HItesUCWS2zPYpICw/zruMA=
@@ -12,5 +18,9 @@ github.com/go-directory/syntax v0.0.0-20260925034620-d925f96bd580 h1:uQgHVzKY7W2
 github.com/go-directory/syntax v0.0.0-20260925034620-d925f96bd580/go.mod h1:JmUw3pDOO/zhtPbrRGdDPezLPDpQu0ntFXv+QtbmVVc=
 github.com/go-directory/syntax v0.0.0-20260925070515-cde4344fbc4a h1:fwgGcUNb/dcrfiXKh8EbwWF/BoKX5njKQBf2fYn1Yfk=
 github.com/go-directory/syntax v0.0.0-20260925070515-cde4344fbc4a/go.mod h1:JmUw3pDOO/zhtPbrRGdDPezLPDpQu0ntFXv+QtbmVVc=
+github.com/go-directory/syntax v0.0.0-20260925084205-fab64e1958fa h1:Yk/t4v6vorL/WZqE/G/s4Z8OhbkbMxdpzm1+Bp/lbcE=
+github.com/go-directory/syntax v0.0.0-20260925084205-fab64e1958fa/go.mod h1:JmUw3pDOO/zhtPbrRGdDPezLPDpQu0ntFXv+QtbmVVc=
+github.com/go-directory/syntax v0.0.0-20260926091258-39b7123fc964 h1:rLMLSDYluCNt5gQRY9RCOrHNlHe9VX+r2lAEgvCaJ8I=
+github.com/go-directory/syntax v0.0.0-20260926091258-39b7123fc964/go.mod h1:uA68cFcWY+gc1/UD8rzN42F76ZuVzRh2Pznkolp7toI=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
