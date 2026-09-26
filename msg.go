@@ -1,9 +1,5 @@
 package protocol
 
-import (
-	"github.com/go-directory/encoding/asn1"
-)
-
 /*
 ProtocolOp implements [§ 4.1.1 of RFC4511], and serves as the ASN.1
 CHOICE component of the [LDAPMessage] SEQUENCE.
@@ -244,7 +240,7 @@ func (r *LDAPMessage) Decode(enc []byte) error {
 	return err
 }
 
-func readRequestOp(tag asn1.Tag, payload []byte) (ret ProtocolOp, err error) {
+func readRequestOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
 	switch tag.Tag {
 	case TagBindRequest:
 		var dec BindRequest
@@ -291,7 +287,7 @@ func readRequestOp(tag asn1.Tag, payload []byte) (ret ProtocolOp, err error) {
 	return
 }
 
-func readResponseOp(tag asn1.Tag, payload []byte) (ret ProtocolOp, err error) {
+func readResponseOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
 	switch tag.Tag {
 	case TagBindResponse:
 		var dec BindResponse
@@ -342,7 +338,7 @@ func readResponseOp(tag asn1.Tag, payload []byte) (ret ProtocolOp, err error) {
 	return
 }
 
-func readProtocolOp(tag asn1.Tag, payload []byte) (ret ProtocolOp, err error) {
+func readProtocolOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
 	if tag.Class != classA {
 		err = protocolError("class mismatch; want 2, got ", itoa(int(tag.Class)))
 		return
@@ -373,5 +369,5 @@ func readProtocolOp(tag asn1.Tag, payload []byte) (ret ProtocolOp, err error) {
 }
 
 var (
-	errMsgIDOOB = protocolError("MessageID: out of bounds; must be 0 .. 2147483647")
+	errMsgIDOOB = constraintViolation("MessageID: ", errTextMaxIntOutOfBounds)
 )

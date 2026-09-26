@@ -21,7 +21,7 @@ func ExampleLDAPMessage_addRequestRoundTripBER() {
 	msg.MessageID = 1763
 	msg.ProtocolOp = req
 	msg.Controls = &Controls{
-		{
+		ControlStandard{
 			ControlType:  []byte(`1.2.3.4.5.6`),
 			Criticality:  true,
 			ControlValue: []byte(`1234567890`),
@@ -42,9 +42,9 @@ func ExampleLDAPMessage_addRequestRoundTripBER() {
 
 	fmt.Printf("MessageID:    %d\n", dec.MessageID)
 	fmt.Printf("Target DN:    %q\n", dec.ProtocolOp.(AddRequest).Entry)
-	fmt.Printf("ControlType:  %s\n", (*dec.Controls)[0].ControlType)
-	fmt.Printf("Criticality:  %t\n", (*dec.Controls)[0].Criticality)
-	fmt.Printf("ControlValue: %s\n", (*dec.Controls)[0].ControlValue)
+	fmt.Printf("ControlType:  %s\n", (*dec.Controls)[0].Type())
+	fmt.Printf("Criticality:  %t\n", (*dec.Controls)[0].Critical())
+	fmt.Printf("ControlValue: %s\n", (*dec.Controls)[0].Value().Bytes)
 	// Output:
 	// MessageID:    1763
 	// Target DN:    "uid=username,ou=accounts,o=acme"
@@ -60,7 +60,7 @@ func ExampleLDAPMessage_delRequestRoundTripBER() {
 	msg.MessageID = 1763
 	msg.ProtocolOp = req
 	msg.Controls = &Controls{
-		{
+		ControlStandard{
 			ControlType:  []byte(`1.2.3.4.5.6`),
 			Criticality:  true,
 			ControlValue: []byte(`1234567890`),
@@ -81,9 +81,9 @@ func ExampleLDAPMessage_delRequestRoundTripBER() {
 
 	fmt.Printf("MessageID:    %d\n", dec.MessageID)
 	fmt.Printf("Target DN:    %q\n", dec.ProtocolOp.(DelRequest))
-	fmt.Printf("ControlType:  %s\n", (*dec.Controls)[0].ControlType)
-	fmt.Printf("Criticality:  %t\n", (*dec.Controls)[0].Criticality)
-	fmt.Printf("ControlValue: %s\n", (*dec.Controls)[0].ControlValue)
+	fmt.Printf("ControlType:  %s\n", (*dec.Controls)[0].Type())
+	fmt.Printf("Criticality:  %t\n", (*dec.Controls)[0].Critical())
+	fmt.Printf("ControlValue: %s\n", (*dec.Controls)[0].Value().Bytes)
 	// Output:
 	// MessageID:    1763
 	// Target DN:    "uid=username,ou=accounts,o=acme"
@@ -122,7 +122,7 @@ func ExampleLDAPMessage_modifyRequestRoundTripBER() {
 	msg.MessageID = 1763
 	msg.ProtocolOp = req
 	msg.Controls = &Controls{
-		{
+		ControlStandard{
 			ControlType:  []byte(`1.2.3.4.5.6`),
 			Criticality:  true,
 			ControlValue: []byte(`1234567890`),
@@ -151,9 +151,9 @@ func ExampleLDAPMessage_modifyRequestRoundTripBER() {
 			attrs[i].Modification.Vals)
 	}
 	fmt.Printf("Control:\n")
-	fmt.Printf("  - Type:\t\t%s\n", (*dec.Controls)[0].ControlType)
-	fmt.Printf("  - Critical:\t%t\n", (*dec.Controls)[0].Criticality)
-	fmt.Printf("  - Value:\t\t%s\n", (*dec.Controls)[0].ControlValue)
+	fmt.Printf("  - Type:\t\t%s\n", (*dec.Controls)[0].Type())
+	fmt.Printf("  - Critical:\t%t\n", (*dec.Controls)[0].Critical())
+	fmt.Printf("  - Value:\t\t%s\n", (*dec.Controls)[0].Value().Bytes)
 	// Output:
 	// MessageID:		1763
 	// Target DN:		"uid=username,ou=accounts,o=acme"

@@ -18,3 +18,7 @@ func constraintViolation(msg ...string) error {
 	m := append([]string{"Constraint violation"}, msg...)
 	return common.LDAPResultConstraintViolation.New(m...)
 }
+
+var (
+	errTextMaxIntOutOfBounds = `out of bounds; must be 0 .. 2147483647`
+)

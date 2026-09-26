@@ -28,7 +28,10 @@ type (
 	AttributeList           = syntax.AttributeList
 	AttributeValue          = syntax.AttributeValue
 	AssertionValue          = syntax.AssertionValue
+	MatchingRuleID          = syntax.MatchingRuleID
 	RelativeLDAPDN          = syntax.RelativeLDAPDN
+	AttributeOption         = syntax.AttributeOption
+	AttributeOptions        = syntax.AttributeOptions
 	PartialAttribute        = syntax.PartialAttribute
 	AttributeSelection      = syntax.AttributeSelection
 	AttributeDescription    = syntax.AttributeDescription

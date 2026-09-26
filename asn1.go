@@ -16,6 +16,9 @@ func aTag(class byte, constr bool, tag uint32) asn1.Tag {
 	}
 }
 
+type RawValue = asn1.RawValue
+type Tag = asn1.Tag
+
 var (
 	readTag   = asn1.ReadTag
 	wrapTLV   = asn1.WrapTLV
@@ -23,6 +26,7 @@ var (
 	readCTLV  = asn1.ReadConstructedTLV
 	readECTLV = asn1.ReadExpectedConstructedTLV
 	readEPTLV = asn1.ReadExpectedPrimitiveTLV
+	readLen   = asn1.ReadLength
 )
 
 func encInt[T asn1.INTEGER](x T) []byte          { return asn1.EncodeInteger[T](x) }
@@ -31,7 +35,7 @@ func decInt[T asn1.INTEGER](x []byte) (T, error) { return asn1.DecodeInteger[T](
 /*
 quick UNIVERSAL SEQUENCE.
 */
-func uSeqTag() asn1.Tag { return aTag(classU, true, uint32(tSeq)) }
+func uSeqTag() Tag { return aTag(classU, true, uint32(tSeq)) }
 
 /*
 private asn1.Class<X> aliases because I'm sick of typing them,
