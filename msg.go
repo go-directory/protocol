@@ -175,14 +175,14 @@ At a minimum, the [MessageID] must be provided when this constructor is called. 
 the [MessageID] is not yet known to the caller, simply allocate a new instance of
 *[LDAPMessage] directly, e.g.:
 
-  msg := &LDAPMessage{}
+	msg := &LDAPMessage{}
 
 The optional variadic [ProtocolOp] argument will result in the provided instance
 being assigned to the underlying "ProtocolOp" component. Depending on the sender
 of this message, the [ProtocolOp] will be of the [Request] or [Response] subset.
 */
 func NewLDAPMessage(id MessageID, op ...ProtocolOp) *LDAPMessage {
-	m := &LDAPMessage{MessageID:id}
+	m := &LDAPMessage{MessageID: id}
 	if len(op) > 0 && op[0] != nil {
 		m.ProtocolOp = op[0]
 	}
