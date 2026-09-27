@@ -26,20 +26,7 @@ type Controls []Control
 /*
 Append appends the input variadic [Control] argument(s) to the receiver instance.
 
-Note that "controlType" uniqueness checking is not performed. Instead, the receiver
-of an [LDAPMessage] which contains any number of [Control] instances should process
-the contents of [Controls] using a "seen table", e.g.:
-
-	seen := make(map[string]struct{})
-	for i := 0; i < len(myCtrls); i++ {
-	    ctrl := myCtrls[i]                // the Control slice
-	    ctrlType := ctrl.Type().String()  // LDAPOID string representation
-	    if _, saw := seen[ctrlType]; saw {
-	      continue
-	    }
-	    seen[ctrlType] = struct{}{} // record that we've now seen this Control
-	    // ... continue processing ctrl as a unique instance
-	}
+Note that "controlType" uniqueness checking is not performed.
 */
 func (r *Controls) Append(ctrl ...Control) { *r = append(*r, ctrl...) }
 
@@ -84,11 +71,13 @@ func (r *Controls) Decode(enc []byte) error {
 		// for the length of the payload.
 		for p < len(payload) && err == nil {
 			var cb []byte
-			cb, err = readECTLV(payload, &p, classU, uint32(tSeq)) // SEQUENCE
+			cb, err = readECTLV(payload, &p,
+				classU, uint32(tSeq)) // SEQUENCE
 			if err == nil {
 				p2 := 0
 				// peek at the ControlType OID
-				ct, _ := readEPTLV(payload[p:], &p2, classU, uint32(tOct)) // LDAPOID
+				ct, _ := readEPTLV(payload[p:], &p2,
+					classU, uint32(tOct)) // LDAPOID
 				var c Control
 				if funk, found := decoders[string(ct)]; found {
 					c, err = funk(cb)
