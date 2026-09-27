@@ -58,4 +58,3 @@ var (
         OIDVChuPasswordWarning = "2.16.840.1.113730.3.4.5"    // draft-vchu-ldap-pwd-policy
 )
 */
-
