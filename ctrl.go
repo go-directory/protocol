@@ -50,10 +50,10 @@ controlType [OIDControlTypeManageDsaIT].
 type ControlManageDsaIT = controls.ManageDsaIT
 
 /*
-        pagedResultsControl ::= SEQUENCE {
-                controlType     1.2.840.113556.1.4.319,
-                criticality     BOOLEAN DEFAULT FALSE,
-                controlValue    searchControlValue }
+	pagedResultsControl ::= SEQUENCE {
+	        controlType     1.2.840.113556.1.4.319,
+	        criticality     BOOLEAN DEFAULT FALSE,
+	        controlValue    searchControlValue }
 
 ControlPagedResults implements [§ 2 of RFC2696] and is identified by the
 controlType [OIDControlTypePagedResults]. Note that because the controlType is
@@ -66,17 +66,17 @@ ASN.1 definition.
 type ControlPagedResults = controls.PagedResults
 
 /*
-        ServerSideSorting ::= SEQUENCE {
-                controlType     LDAPOID,
-                criticality     BOOLEAN DEFAULT FALSE,
-                controlValue    SortKeyList }
+	ServerSideSorting ::= SEQUENCE {
+	        controlType     LDAPOID,
+	        criticality     BOOLEAN DEFAULT FALSE,
+	        controlValue    SortKeyList }
 
-        SortKeyList ::= SEQUENCE OF sortKey SortKey
+	SortKeyList ::= SEQUENCE OF sortKey SortKey
 
-        SortKey ::= SEQUENCE {
-                attributeType   AttributeDescription,
-                orderingRule    [0] MatchingRuleId OPTIONAL,
-                reverseOrder    [1] BOOLEAN DEFAULT FALSE }
+	SortKey ::= SEQUENCE {
+	        attributeType   AttributeDescription,
+	        orderingRule    [0] MatchingRuleId OPTIONAL,
+	        reverseOrder    [1] BOOLEAN DEFAULT FALSE }
 
 ControlServerSideSorting implements [§ 1.1 of RFC2891], and is identified by the controlType
 [OIDControlTypeServerSideSorting].
@@ -98,16 +98,15 @@ type ControlSubtreeDelete = controls.SubtreeDelete
 Control OIDs associated with [Control] definitions supported by this package.
 */
 var (
-	OIDControlTypePagedResults            = controls.OIDPagedResults		// RFC 2696
-	OIDControlTypeManageDsaIT             = controls.OIDManageDsaIT 		// RFC3296
-	OIDControlTypeWhoAmI                  = controls.OIDWhoAmI 			// RFC4532
-	OIDControlTypeSubtreeDelete           = controls.OIDSubtreeDelete 		// draft-armijo-ldap-treedelete
-	OIDControlTypeServerSideSorting       = controls.OIDServerSideSorting		// RFC2891
-	OIDControlTypeServerSideSortingResult = controls.OIDServerSideSortingResult	// RFC2891
+	OIDControlTypePagedResults            = controls.OIDPagedResults            // RFC 2696
+	OIDControlTypeManageDsaIT             = controls.OIDManageDsaIT             // RFC3296
+	OIDControlTypeWhoAmI                  = controls.OIDWhoAmI                  // RFC4532
+	OIDControlTypeSubtreeDelete           = controls.OIDSubtreeDelete           // draft-armijo-ldap-treedelete
+	OIDControlTypeServerSideSorting       = controls.OIDServerSideSorting       // RFC2891
+	OIDControlTypeServerSideSortingResult = controls.OIDServerSideSortingResult // RFC2891
 )
 
 /*
 ControlNames contains a numeric OID to friendly Control name table.
 */
 var ControlNames = controls.Names
-
