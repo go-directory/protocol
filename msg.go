@@ -47,7 +47,11 @@ type Response interface {
 	isResponseOp()
 }
 
-// request CHOICE names
+/*
+Request CHOICE names, as defined in [§ 4.1.1 of RFC4511].
+
+[§ 4.1.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.1.1
+*/
 const (
 	nameAbandonRequestChoice  = `abandonRequest`
 	nameAddRequestChoice      = `addRequest`
@@ -61,7 +65,11 @@ const (
 	nameUnbindRequestChoice   = `unbindRequest`
 )
 
-// response CHOICE names
+/*
+Response CHOICE names, as defined in [§ 4.1.1 of RFC4511].
+
+[§ 4.1.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.1.1
+*/
 const (
 	nameAddResponseChoice           = `addResponse`
 	nameBindResponseChoice          = `bindResponse`
@@ -97,7 +105,7 @@ func (r MessageID) Encode() ([]byte, error) {
 	if int32(r) < 0 {
 		return nil, errMsgIDOOB
 	}
-	enc := encInt[int64](int64(r))
+	enc := encInt[int32](int32(r))
 	return enc, nil
 }
 
@@ -107,7 +115,7 @@ input encoding to the receiver instance. The encoding must not be
 truncated and must bear the ASN.1 INTEGER tag (0x02).
 */
 func (r *MessageID) Decode(enc []byte) error {
-	dec, err := decInt[int64](enc)
+	dec, err := decInt[int32](enc)
 	if err == nil {
 		if !(0 <= dec && dec <= UBMessageID) {
 			return errMsgIDOOB
@@ -157,12 +165,20 @@ type LDAPMessage struct {
 }
 
 /*
-NewLDAPMessage initializes and returns an instance of *[LDAPMessage]. The
-optional variadic [ProtocolOp] argument will result in the provided instance
-being assigned to the underlying "ProtocolOp" component.
+NewLDAPMessage initializes and returns an instance of *[LDAPMessage].
+
+At a minimum, the [MessageID] must be provided when this constructor is called. If
+the [MessageID] is not yet known to the caller, simply allocate a new instance of
+*[LDAPMessage] directly, e.g.:
+
+  msg := &LDAPMessage{}
+
+The optional variadic [ProtocolOp] argument will result in the provided instance
+being assigned to the underlying "ProtocolOp" component. Depending on the sender
+of this message, the [ProtocolOp] will be of the [Request] or [Response] subset.
 */
-func NewLDAPMessage(op ...ProtocolOp) *LDAPMessage {
-	m := &LDAPMessage{}
+func NewLDAPMessage(id MessageID, op ...ProtocolOp) *LDAPMessage {
+	m := &LDAPMessage{MessageID:id}
 	if len(op) > 0 && op[0] != nil {
 		m.ProtocolOp = op[0]
 	}
@@ -177,7 +193,7 @@ an attempt to encode the contents of the receiver as a SEQUENCE.
 func (r LDAPMessage) Encode() ([]byte, error) {
 	var enc []byte
 
-	mid := encInt[uint](uint(r.MessageID))
+	mid, _ := r.MessageID.Encode()
 	enc = append(enc, mid...)
 	pop, err := r.ProtocolOp.Encode()
 	if err == nil {
@@ -212,9 +228,7 @@ func (r *LDAPMessage) Decode(enc []byte) error {
 		p := 0
 		_, err = readEPTLV(payload, &p, classU, uint32(tInt))
 		if err == nil {
-			var uu int64
-			if uu, err = decInt[int64](payload[:p]); err == nil {
-				r.MessageID = MessageID(uu)
+			if err = r.MessageID.Decode(payload[:p]); err == nil {
 				rest := payload[p:]
 				if err == nil {
 					p = 0

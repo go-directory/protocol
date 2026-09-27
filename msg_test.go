@@ -17,9 +17,7 @@ func ExampleLDAPMessage_addRequestRoundTripBER() {
 		},
 	}
 
-	msg := NewLDAPMessage()
-	msg.MessageID = 1763
-	msg.ProtocolOp = req
+	msg := NewLDAPMessage(1763, req)
 	msg.Controls = &Controls{
 		ControlStandard{
 			ControlType:  []byte(`1.2.3.4.5.6`),
@@ -56,9 +54,7 @@ func ExampleLDAPMessage_addRequestRoundTripBER() {
 func ExampleLDAPMessage_delRequestRoundTripBER() {
 	req := DelRequest("uid=username,ou=accounts,o=acme")
 
-	msg := NewLDAPMessage()
-	msg.MessageID = 1763
-	msg.ProtocolOp = req
+	msg := NewLDAPMessage(1763, req)
 	msg.Controls = &Controls{
 		ControlStandard{
 			ControlType:  []byte(`1.2.3.4.5.6`),
@@ -118,9 +114,7 @@ func ExampleLDAPMessage_modifyRequestRoundTripBER() {
 		},
 	}
 
-	msg := NewLDAPMessage()
-	msg.MessageID = 1763
-	msg.ProtocolOp = req
+	msg := NewLDAPMessage(1763, req)
 	msg.Controls = &Controls{
 		ControlStandard{
 			ControlType:  []byte(`1.2.3.4.5.6`),
