@@ -71,6 +71,13 @@ type LDAPResult struct {
 	Referral          *Referral
 }
 
+func (r *LDAPResult) AppendReferral(ref ...URI) {
+	if r.Referral == nil {
+		(*r.Referral) = Referral{}
+	}
+	(*r.Referral) = append((*r.Referral), ref...)
+}
+
 func (r LDAPResult) Encode() ([]byte, error) {
 	var out []byte
 	code, err := r.ResultCode.Encode()
