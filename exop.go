@@ -221,3 +221,15 @@ func (_ ExtendedResponse) Choice() string { return nameExtendedResponseChoice }
 func (_ ExtendedResponse) Tag() int       { return TagExtendedResponse }
 func (_ ExtendedResponse) isProtocolOp()  {}
 func (_ ExtendedResponse) isResponseOp()  {}
+
+/*
+Request and Response notice identifiers.
+*/
+var (
+	NoticeOfDisconnection   = LDAPOID("1.3.6.1.4.1.1466.2003")
+	NoticeOfCancel          = LDAPOID("1.3.6.1.1.8")
+	NoticeOfStartTLS        = LDAPOID("1.3.6.1.4.1.1466.20037")
+	NoticeOfWhoAmI          = LDAPOID("1.3.6.1.4.1.4203.1.11.3")
+	NoticeOfGetConnectionID = LDAPOID("1.3.6.1.4.1.26027.1.6.2")
+	NoticeOfPasswordModify  = LDAPOID("1.3.6.1.4.1.4203.1.11.1")
+)
