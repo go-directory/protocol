@@ -71,8 +71,10 @@ type LDAPResult struct {
 	Referral          *Referral
 }
 
-func (r LDAPResult) Choice() string { return `result` }
-func (r LDAPResult) Kind()   string { return `result` }
+func (_ LDAPResult) Choice() string { return `result` }
+func (_ LDAPResult) Kind()   string { return `result` }
+func (_ LDAPResult) Tag()    int    { return -1 }
+func (_ LDAPResult) isProtocolOp()  {}
 
 func (r *LDAPResult) AppendReferral(ref ...URI) {
 	if r.Referral == nil {
