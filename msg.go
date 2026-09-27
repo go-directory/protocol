@@ -101,6 +101,10 @@ of int32:
 */
 type MessageID int32
 
+/*
+Encode returns an instance of []byte alongside an error following an attempt to
+encode the contents of the receiver instance as an ASN.1 INTEGER.
+*/
 func (r MessageID) Encode() ([]byte, error) {
 	if int32(r) < 0 {
 		return nil, errMsgIDOOB
