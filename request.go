@@ -9,7 +9,7 @@ import (
 )
 
 /*
-Request implements a subset of [ProtocolOp], encompassing only the *request*
+Request implements a subset of LDAPMessage.ProtocolOp, encompassing only the *request*
 types defined throughout the subsections of [§ 4.1 of RFC4511].
 
 [§ 4.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.1
@@ -20,7 +20,7 @@ type Request = request.Request
 	MessageID ::= INTEGER (0 ..  maxInt)
 
 MessageID implements [§ 4.1.1 of RFC4511], and serves the "messageID"
-component of the [LDAPMessage] SEQUENCE.
+component of the LDAPMessage SEQUENCE.
 
 Note that instances of this type are constrained to the unsigned portion
 of int32:
