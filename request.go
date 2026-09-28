@@ -33,7 +33,7 @@ of int32:
 type MessageID = request.MessageID
 
 /*
-Request tags.
+Request tags, linked from the [request] package.
 */
 const (
 	TagBindRequest     = request.TagBind     // 0
@@ -70,6 +70,16 @@ var (
 	requestDecode      = request.Decode
 	requestDecodeByTag = request.DecodeByTag
 )
+
+/*
+StartTLSRequest defines an instance of [ExtendedRequest], per [§ 4.14.1 of RFC4511].
+It is used by the DUA to request StartTLS be used for the session.
+
+[§ 4.14.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.14.1
+*/
+var StartTLSRequest = ExtendedRequest{
+	RequestName: request.NoticeOfStartTLS,
+}
 
 /*
 	ModifyRequest ::= [APPLICATION 6] SEQUENCE {

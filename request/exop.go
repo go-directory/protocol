@@ -112,20 +112,6 @@ func (r *Extended) Decode(enc []byte) error {
 }
 
 /*
-StartTLS implements the [Extended] [Request] type per [§ 4.14.1 of RFC4511].
-
-This function is intended for a client to use to request the use of TLS for
-the session.
-
-[§ 4.14.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.14.1
-*/
-func StartTLS() Extended {
-	return Extended{
-		RequestName: NoticeOfStartTLS,
-	}
-}
-
-/*
 Request and Response notice identifiers.
 */
 var (
