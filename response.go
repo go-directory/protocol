@@ -70,7 +70,10 @@ LDAPResult implements [§ 4.1.9 of RFC4511]. See also the LDAP result code const
 */
 type LDAPResult = response.LDAPResult
 
-var responseDecode = response.Decode
+var (
+        responseDecode      = response.Decode
+        responseDecodeByTag = response.DecodeByTag
+)
 
 /*
 Response tags.

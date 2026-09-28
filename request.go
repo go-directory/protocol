@@ -66,7 +66,10 @@ const (
 	nameUnbindRequestChoice   = `unbindRequest`
 )
 
-var requestDecode = request.Decode
+var (
+	requestDecode      = request.Decode
+	requestDecodeByTag = request.DecodeByTag
+)
 
 /*
 	ModifyRequest ::= [APPLICATION 6] SEQUENCE {
