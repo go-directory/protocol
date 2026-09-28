@@ -88,3 +88,112 @@ const (
 	TagExtendedResponse      = response.TagExtended              // 24
 	TagIntermediateResponse  = response.TagIntermediate          // 25
 )
+
+/*
+	AddResponse ::= [APPLICATION 9] LDAPResult
+
+Add implements [§ 4.7 of RFC4511].
+
+[§ 4.7 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.7
+*/
+type AddResponse = response.Add
+
+/*
+	BindResponse ::= [APPLICATION 1] SEQUENCE {
+		COMPONENTS OF LDAPResult,
+		serverSaslCreds    [7] OCTET STRING OPTIONAL }
+
+Bind implements [§ 4.2.2 of RFC4511].
+
+[§ 4.2.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.2.2
+*/
+type BindResponse = response.Bind
+
+/*
+	CompareResponse ::= [APPLICATION 15] LDAPResult
+
+Compare implements [§ 4.10 of RFC4511].
+
+[§ 4.10 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.10
+*/
+type CompareResponse = response.Compare
+
+/*
+	ExtendedResponse ::= [APPLICATION 24] SEQUENCE {
+		COMPONENTS OF LDAPResult,
+		responseName     [10] LDAPOID OPTIONAL,
+		responseValue    [11] OCTET STRING OPTIONAL }
+
+Extended implements [§ 4.12 of RFC4511].
+
+[§ 4.12 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.12
+*/
+type ExtendedResponse = response.Extended
+
+/*
+	DelResponse ::= [APPLICATION 11] LDAPResult
+
+Del implements [§ 4.8 of RFC4511], circumscribing an [LDAPResult].
+
+[§ 4.8 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.8
+*/
+type DelResponse = response.Del
+
+/*
+	IntermediateResponse ::= [APPLICATION 25] SEQUENCE {
+	     responseName     [0] LDAPOID OPTIONAL,
+	     responseValue    [1] OCTET STRING OPTIONAL }
+
+Intermediate implements [§ 4.13 of RFC4511].
+
+[§ 4.13 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.13
+*/
+type IntermediateResponse = response.Intermediate
+
+/*
+	ModifyDNResponse ::= [APPLICATION 13] LDAPResult
+
+ModifyDN implements [§ 4.9 of RFC4511], circumscribing an [LDAPResult].
+
+[§ 4.9 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.9
+*/
+type ModifyDNResponse = response.ModifyDN
+
+/*
+	ModifyResponse ::= [APPLICATION 7] LDAPResult
+
+Modify implements [§ 4.6 of RFC4511], circumscribing an [LDAPResult].
+
+[§ 4.6 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.6
+*/
+type ModifyResponse = response.Modify
+
+/*
+	SearchResultDone ::= [APPLICATION 5] LDAPResult
+
+SearchResultDone implements [§ 4.5.2 of RFC4511], circumscribing
+an [LDAPResult] SEQUENCE.
+
+[§ 4.5.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.2
+*/
+type SearchResultDone = response.SearchResultDone
+
+/*
+	SearchResultReference ::= [APPLICATION 19] SEQUENCE SIZE (1..MAX) OF uri URI
+
+SearchResultReference implements [§ 4.5.2 of RFC4511].
+
+[§ 4.5.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.2
+*/
+type SearchResultReference = response.SearchResultReference
+
+/*
+	SearchResultEntry ::= [APPLICATION 4] SEQUENCE {
+	    objectName LDAPDN,
+	    attributes PartialAttributeList }
+
+SearchResultEntry implements [§ 4.5.2 of RFC4511].
+
+[§ 4.5.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.2
+*/
+type SearchResultEntry = response.SearchResultEntry
