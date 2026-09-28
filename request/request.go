@@ -23,7 +23,7 @@ type instance.
 This function is used when it is not known what kind of [Request] is defined in
 the input encoding.
 
-See also [DecodeByTag] if the
+See also [DecodeByTag] if the [Tag] has already been acquired.
 */
 func Decode(enc []byte) (Request, error) {
 	p := 0
