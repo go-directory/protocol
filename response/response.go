@@ -23,11 +23,11 @@ type instance.
 This function is used when it is not known what kind of [Response] is defined in
 the input encoding.
 
-See also [DecodeByTag] if the 
+See also [DecodeByTag] if the
 */
 func Decode(enc []byte) (Response, error) {
 	p := 0
-        tag, _, _ := readCTLV(enc, &p)
+	tag, _, _ := readCTLV(enc, &p)
 	return DecodeByTag(tag, enc[:p])
 }
 
