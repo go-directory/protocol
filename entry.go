@@ -15,7 +15,7 @@ advantageous.
 Instances of this type are NOT used in any official LDAP operation, such as
 Search, Delete and others.
 
-Though this type bears a strong resemblance to the [SearchResultEntry] type,
+Though this type bears a strong resemblance to the [response.SearchResultEntry] type,
 the two are not related.
 
 See the [NewEntry] constructor for a means of assembling new instances of this
