@@ -8,6 +8,9 @@ import (
 	"github.com/go-directory/protocol/response"
 )
 
+/*
+Response links to the [response.Response] interface type.
+*/
 type Response = response.Response
 
 /*
@@ -74,6 +77,16 @@ var (
         responseDecode      = response.Decode
         responseDecodeByTag = response.DecodeByTag
 )
+
+/*
+StartTLSResponse defines an instance of [ExtendedResponse], per [§ 4.14.2 of RFC4511].
+It is used by the DSA to respond to a request for StartTLS.
+
+[§ 4.14.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.14.2
+*/
+var StartTLSResponse = ExtendedResponse{
+        ResponseName: &response.NoticeOfStartTLS,
+}
 
 /*
 Response tags.

@@ -122,21 +122,6 @@ const (
 )
 
 /*
-StartTLS implements the [Extended] [Response] type per [§ 4.14.2 of RFC4511].
-
-This function is intended for a server to use to when responsing to a client's
-request that TLS be used for the session.
-
-[§ 4.14.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.14.2
-*/
-func StartTLS() Extended {
-        return Extended{
-                ResponseName: &NoticeOfStartTLS,
-        }
-}
-
-
-/*
 Response notice identifiers.
 */
 var (
