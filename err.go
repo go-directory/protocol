@@ -7,7 +7,6 @@ import (
 )
 
 var itoa = strconv.Itoa
-var atoi = strconv.Atoi
 
 func protocolError(msg ...string) error {
 	m := append([]string{"Protocol error"}, msg...)

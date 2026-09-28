@@ -14,120 +14,7 @@ type ProtocolOp interface {
 	Choice() string
 	Kind() string
 	Tag() int
-	isProtocolOp()
-}
-
-/*
-Request implements a subset of [ProtocolOp], encompassing only the *request*
-types defined throughout the subsections of [§ 4.1 of RFC4511].
-
-[§ 4.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.1
-*/
-type Request interface {
-	Encode() ([]byte, error)
-	Choice() string
-	Kind() string
-	Tag() int
-	isProtocolOp()
-	isRequestOp()
-}
-
-/*
-Response implements a subset of [ProtocolOp], encompassing only the *response*
-types defined throughout the subsections of [§ 4.1 of RFC4511].
-
-[§ 4.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.1
-*/
-type Response interface {
-	Encode() ([]byte, error)
-	Choice() string
-	Kind() string
-	Tag() int
-	isProtocolOp()
-	isResponseOp()
-}
-
-/*
-Request CHOICE names, as defined in [§ 4.1.1 of RFC4511].
-
-[§ 4.1.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.1.1
-*/
-const (
-	nameAbandonRequestChoice  = `abandonRequest`
-	nameAddRequestChoice      = `addRequest`
-	nameBindRequestChoice     = `bindRequest`
-	nameCompareRequestChoice  = `compareRequest`
-	nameDelRequestChoice      = `delRequest`
-	nameExtendedRequestChoice = `extendedReq`
-	nameModifyRequestChoice   = `modifyRequest`
-	nameModifyDNRequestChoice = `modDNRequest`
-	nameSearchRequestChoice   = `searchRequest`
-	nameUnbindRequestChoice   = `unbindRequest`
-)
-
-/*
-Response CHOICE names, as defined in [§ 4.1.1 of RFC4511].
-
-[§ 4.1.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.1.1
-*/
-const (
-	nameAddResponseChoice           = `addResponse`
-	nameBindResponseChoice          = `bindResponse`
-	nameCompareResponseChoice       = `compareResponse`
-	nameDelResponseChoice           = `delResponse`
-	nameIntermediateResponseChoice  = `intermediateResponse`
-	nameExtendedResponseChoice      = `extendedResp`
-	nameModifyResponseChoice        = `modifyResponse`
-	nameModifyDNResponseChoice      = `modDNResponse`
-	nameSearchResponseChoice        = `searchResponse`
-	nameSearchResultEntryChoice     = `searchResEntry`
-	nameSearchResultDoneChoice      = `searchResDone`
-	nameSearchResultReferenceChoice = `searchResRef`
-)
-
-/*
-	MessageID ::= INTEGER (0 ..  maxInt)
-
-MessageID implements [§ 4.1.1 of RFC4511], and serves the "messageID"
-component of the [LDAPMessage] SEQUENCE.
-
-Note that instances of this type are constrained to the unsigned portion
-of int32:
-
-	(0 ..  maxInt)
-	maxInt INTEGER ::= 2147483647 -- (2^^31 - 1) --
-
-[§ 4.1.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.1.1
-*/
-type MessageID int32
-
-/*
-Encode returns an instance of []byte alongside an error following an attempt to
-encode the contents of the receiver instance as an ASN.1 INTEGER.
-*/
-func (r MessageID) Encode() ([]byte, error) {
-	if int32(r) < 0 {
-		return nil, errMsgIDOOB
-	}
-	enc := encInt[int32](int32(r))
-	return enc, nil
-}
-
-/*
-Decode returns an error following an attempt to decode and write the
-input encoding to the receiver instance. The encoding must not be
-truncated and must bear the ASN.1 INTEGER tag (0x02).
-*/
-func (r *MessageID) Decode(enc []byte) error {
-	dec, err := decInt[int32](enc)
-	if err == nil {
-		if !(0 <= dec && dec <= UBMessageID) {
-			return errMsgIDOOB
-		}
-		*r = MessageID(int32(dec))
-	}
-
-	return err
+	IsProtocolOp()
 }
 
 /*
@@ -191,8 +78,8 @@ func NewLDAPMessage(id MessageID, op ...ProtocolOp) *LDAPMessage {
 }
 
 /*
-Encode returns an instance of []byte alongside an error following
-an attempt to encode the contents of the receiver as a SEQUENCE.
+Encode returns an instance of []byte alongside an error following an attempt
+to encode the contents of the receiver as a UNIVERSAL SEQUENCE.
 */
 func (r LDAPMessage) Encode() ([]byte, error) {
 	var enc []byte
@@ -224,7 +111,7 @@ func (r LDAPMessage) Encode() ([]byte, error) {
 /*
 Decode returns an error following an attempt to decode and write the
 input encoding value to the receiver instance. The encoding must not
-be truncated and must bear the SEQUENCE (0x10) tag.
+be truncated and must bear the UNIVERSAL SEQUENCE (0x30) tag.
 */
 func (r *LDAPMessage) Decode(enc []byte) error {
 	payload, err := unwrapTLV(enc, uSeqTag())
@@ -258,104 +145,6 @@ func (r *LDAPMessage) Decode(enc []byte) error {
 	return err
 }
 
-func readRequestOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
-	switch tag.Tag {
-	case TagBindRequest:
-		var dec BindRequest
-		err = dec.Decode(payload)
-		ret = dec
-	case TagUnbindRequest:
-		var dec UnbindRequest
-		err = dec.Decode(payload)
-		ret = dec
-	case TagSearchRequest:
-		var dec SearchRequest
-		err = dec.Decode(payload)
-		ret = dec
-	case TagModifyRequest:
-		var dec ModifyRequest
-		err = dec.Decode(payload)
-		ret = dec
-	case TagAddRequest:
-		var dec AddRequest
-		err = dec.Decode(payload)
-		ret = dec
-	case TagDelRequest:
-		var dec DelRequest
-		err = dec.Decode(payload)
-		ret = dec
-	case TagModifyDNRequest:
-		var dec ModifyDNRequest
-		err = dec.Decode(payload)
-		ret = dec
-	case TagCompareRequest:
-		var dec DelRequest
-		err = dec.Decode(payload)
-		ret = dec
-	case TagAbandonRequest:
-		var dec AbandonRequest
-		err = dec.Decode(payload)
-		ret = dec
-	case TagExtendedRequest:
-		var dec ExtendedRequest
-		err = dec.Decode(payload)
-		ret = dec
-	}
-
-	return
-}
-
-func readResponseOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
-	switch tag.Tag {
-	case TagBindResponse:
-		var dec BindResponse
-		err = dec.Decode(payload)
-		ret = dec
-	case TagSearchResultEntry:
-		var dec SearchResultEntry
-		err = dec.Decode(payload)
-		ret = dec
-	case TagSearchResultDone:
-		var dec SearchResultDone
-		err = dec.Decode(payload)
-		ret = dec
-	case TagSearchResultReference:
-		var dec SearchResultReference
-		err = dec.Decode(payload)
-		ret = dec
-	case TagModifyResponse:
-		var dec ModifyResponse
-		err = dec.Decode(payload)
-		ret = dec
-	case TagAddResponse:
-		var dec AddResponse
-		err = dec.Decode(payload)
-		ret = dec
-	case TagDelResponse:
-		var dec DelResponse
-		err = dec.Decode(payload)
-		ret = dec
-	case TagModifyDNResponse:
-		var dec ModifyDNResponse
-		err = dec.Decode(payload)
-		ret = dec
-	case TagCompareResponse:
-		var dec CompareResponse
-		err = dec.Decode(payload)
-		ret = dec
-	case TagExtendedResponse:
-		var dec ExtendedResponse
-		err = dec.Decode(payload)
-		ret = dec
-	case TagIntermediateResponse:
-		var dec IntermediateResponse
-		err = dec.Decode(payload)
-		ret = dec
-	}
-
-	return
-}
-
 func readProtocolOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
 	if tag.Class != classA {
 		err = protocolError("class mismatch; want 2, got ", itoa(int(tag.Class)))
@@ -368,7 +157,7 @@ func readProtocolOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
 		TagModifyRequest, TagAddRequest,
 		TagDelRequest, TagModifyDNRequest,
 		TagCompareRequest, TagAbandonRequest:
-		ret, err = readRequestOp(tag, payload)
+		ret, err = requestDecode(tag, payload)
 
 	case TagBindResponse, TagModifyResponse,
 		TagAddResponse, TagDelResponse,
@@ -376,7 +165,7 @@ func readProtocolOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
 		TagExtendedResponse, TagIntermediateResponse,
 		TagSearchResultEntry, TagSearchResultDone,
 		TagSearchResultReference:
-		ret, err = readResponseOp(tag, payload)
+		ret, err = responseDecode(tag, payload)
 
 	default:
 		err = protocolError("readProtocolOp: invalid tag value ",
@@ -385,7 +174,3 @@ func readProtocolOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
 
 	return
 }
-
-var (
-	errMsgIDOOB = constraintViolation("MessageID: ", errTextMaxIntOutOfBounds)
-)
