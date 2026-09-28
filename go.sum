@@ -24,5 +24,9 @@ github.com/go-directory/syntax v0.0.0-20260925084205-fab64e1958fa h1:Yk/t4v6vorL
 github.com/go-directory/syntax v0.0.0-20260925084205-fab64e1958fa/go.mod h1:JmUw3pDOO/zhtPbrRGdDPezLPDpQu0ntFXv+QtbmVVc=
 github.com/go-directory/syntax v0.0.0-20260926091258-39b7123fc964 h1:rLMLSDYluCNt5gQRY9RCOrHNlHe9VX+r2lAEgvCaJ8I=
 github.com/go-directory/syntax v0.0.0-20260926091258-39b7123fc964/go.mod h1:uA68cFcWY+gc1/UD8rzN42F76ZuVzRh2Pznkolp7toI=
+github.com/go-directory/syntax v0.0.0-20260927233629-36cd71f4c55e h1:WrFFaHIRE4RWqYG/0y7oE5lMtYySYwH1vI69+yKqjl4=
+github.com/go-directory/syntax v0.0.0-20260927233629-36cd71f4c55e/go.mod h1:uA68cFcWY+gc1/UD8rzN42F76ZuVzRh2Pznkolp7toI=
+github.com/go-directory/syntax v0.0.0-20260928012759-9134af714404 h1:AuO441hECd00pxqYNXGs8YhO704N5875E/7OaIUpMBo=
+github.com/go-directory/syntax v0.0.0-20260928012759-9134af714404/go.mod h1:uA68cFcWY+gc1/UD8rzN42F76ZuVzRh2Pznkolp7toI=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
