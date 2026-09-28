@@ -84,14 +84,14 @@ to encode the contents of the receiver as a UNIVERSAL SEQUENCE.
 func (r LDAPMessage) Encode() ([]byte, error) {
 	var enc []byte
 
-	mid, _ := r.MessageID.Encode()
+	mid, _ := r.MessageID.Encode() // INTEGER
 	enc = append(enc, mid...)
-	pop, err := r.ProtocolOp.Encode()
+	pop, err := r.ProtocolOp.Encode() // ProtocolOp==Response|Request
 	if err == nil {
 		enc = append(enc, pop...)
 		if r.Controls != nil {
 			var ctrl []byte
-			if ctrl, err = r.Controls.Encode(); err == nil {
+			if ctrl, err = r.Controls.Encode(); err == nil { // SEQUENCE OF control Control
 				var wrap []byte
 				wrap, err = wrapTLV(ctrl, aTag(classC, true, uint32(0)))
 
@@ -101,7 +101,7 @@ func (r LDAPMessage) Encode() ([]byte, error) {
 			}
 		}
 		if err == nil {
-			enc, err = wrapTLV(enc, uSeqTag())
+			enc, err = wrapTLV(enc, uSeqTag()) // SEQUENCE
 		}
 	}
 
@@ -114,27 +114,25 @@ input encoding value to the receiver instance. The encoding must not
 be truncated and must bear the UNIVERSAL SEQUENCE (0x30) tag.
 */
 func (r *LDAPMessage) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc, uSeqTag())
+	payload, err := unwrapTLV(enc, uSeqTag()) // SEQUENCE
 	if err == nil {
 		p := 0
 		_, err = readEPTLV(payload, &p, classU, uint32(tInt))
 		if err == nil {
-			if err = r.MessageID.Decode(payload[:p]); err == nil {
+			if err = r.MessageID.Decode(payload[:p]); err == nil { // INTEGER
 				rest := payload[p:]
-				if err == nil {
-					p = 0
-					tag, _, _ := readCTLV(rest, &p)
-					r.ProtocolOp, err = readProtocolOp(tag, rest[:p])
-					if err == nil && len(rest) > p {
-						var unwrap []byte
-						unwrap, err = unwrapTLV(rest[p:],
-							aTag(classC, true, uint32(0)))
+				p = 0
+				tag, _, _ := readCTLV(rest, &p)
+				r.ProtocolOp, err = readProtocolOp(tag, rest[:p]) // ProtocolOp==Response|Request
+				if err == nil && len(rest) > p {
+					var unwrap []byte
+					unwrap, err = unwrapTLV(rest[p:],
+						aTag(classC, true, uint32(0)))
 
-						if err == nil {
-							var dec Controls
-							if err = dec.Decode(unwrap); err == nil {
-								r.Controls = &dec
-							}
+					if err == nil {
+						var dec Controls
+						if err = dec.Decode(unwrap); err == nil { // SEQUENCE OF control Control
+							r.Controls = &dec
 						}
 					}
 				}
@@ -157,7 +155,7 @@ func readProtocolOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
 		TagModifyRequest, TagAddRequest,
 		TagDelRequest, TagModifyDNRequest,
 		TagCompareRequest, TagAbandonRequest:
-		ret, err = requestDecode(tag, payload)
+		ret, err = requestDecodeByTag(tag, payload)
 
 	case TagBindResponse, TagModifyResponse,
 		TagAddResponse, TagDelResponse,
@@ -165,7 +163,7 @@ func readProtocolOp(tag Tag, payload []byte) (ret ProtocolOp, err error) {
 		TagExtendedResponse, TagIntermediateResponse,
 		TagSearchResultEntry, TagSearchResultDone,
 		TagSearchResultReference:
-		ret, err = responseDecode(tag, payload)
+		ret, err = responseDecodeByTag(tag, payload)
 
 	default:
 		err = protocolError("readProtocolOp: invalid tag value ",
