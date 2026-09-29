@@ -43,6 +43,27 @@ func (r *Bind) SetVersion(v int) {
 	}
 }
 
+/*
+SimpleBind returns an instance of [Bind] in the context of a "simple"
+[AuthenticationChoice]. Successful use of this method will return the
+following structure:
+
+  Bind{
+        Version: 3,
+        Name: LDAPDN(<the bind dn>),                      // LDAPDN (OCTET STRING)
+        Authentication: SimpleCredentials(<the bind pw>), // Authentication CHOICE [0], OCTET STRING
+  }
+*/
+func SimpleBind(bdn LDAPDN, bpw SimpleCredentials) Bind {
+        req := Bind{
+                Name: bdn,
+                Authentication: bpw,
+        }
+        req.SetVersion(3)
+
+        return req
+}
+
 func (_ Bind) IsProtocolOp()  {}
 func (_ Bind) IsRequestOp()   {}
 func (_ Bind) Kind() string   { return `request` }

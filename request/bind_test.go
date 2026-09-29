@@ -4,6 +4,16 @@ import (
 	"fmt"
 )
 
+func ExampleSimpleBind() {
+	req := SimpleBind(
+		[]byte("uid=someone,ou=people,o=acme"), // BindDN
+		[]byte("coolP@$$werd"))			// BindPW
+
+        fmt.Printf("{ Version: %s, Name: %q, Choice: %s }",
+                req.Version, req.Name, req.Authentication.Choice())
+        // Output: { Version: 3, Name: "uid=someone,ou=people,o=acme", Choice: simple }
+}
+
 func ExampleBind_roundTripBER() {
 	name, _ := NewLDAPDN([]byte("uid=someone,ou=people,o=acme"))
 	req := Bind{
