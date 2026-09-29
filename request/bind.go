@@ -209,6 +209,9 @@ func (r *SaslCredentials) Decode(enc []byte) error {
 
 SimpleCredentials wraps an [OctetString] within a CONTEXT-SPECIFIC tag of [0], and
 and serves as the "simple" CHOICE of [AuthenticationChoice].
+
+Generally, instances of this store the simple bind password value, while the envelope
+[Bind] request contains the associated bind distinguished name.
 */
 type SimpleCredentials OctetString
 
