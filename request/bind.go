@@ -9,6 +9,14 @@ const (
 )
 
 /*
+Bind version value constraints.
+*/
+const (
+	LBBindVersion = 1   // lower bounds
+	UBBindVersion = 127 // upper bounds
+)
+
+/*
 	BindRequest ::= [APPLICATION 0] SEQUENCE {
 		version                 INTEGER (1 ..  127),
 		name                    LDAPDN,
@@ -22,6 +30,17 @@ type Bind struct {
 	Version        Integer
 	Name           LDAPDN
 	Authentication AuthenticationChoice
+}
+
+/*
+SetVersion sets the version of the receiver instance. This method is merely
+a convenient alternative to manual invocation of [syntax.NewInteger].
+*/
+func (r *Bind) SetVersion(v int) {
+	version, _ := NewInteger(v)
+	if (version.Ge(LBBindVersion) && version.Le(UBBindVersion)) {
+		r.Version = version
+	}
 }
 
 func (_ Bind) IsProtocolOp()  {}
