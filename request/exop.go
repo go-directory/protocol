@@ -27,31 +27,23 @@ an attempt to encode the contents of the receiver instance as an
 [APPLICATION 23] tag, circumscribing a SEQUENCE.
 */
 func (r Extended) Encode() ([]byte, error) {
-	var enc []byte
-	cmpnt, err := r.RequestName.Encode()
-	if err == nil {
-		cmpnt, err = wrapTLV(cmpnt,
-			aTag(classC,
-				false, uint32(TagExtendedName)))
+	var enc, cmpnt []byte
+	var err error
+	cmpnt, err = wrapTLV(r.RequestName,
+		aTag(classC, false, uint32(TagExtendedName)))
 
-		if err == nil {
-			enc = append(enc, cmpnt...)
-			if r.RequestValue != nil {
-				cmpnt, err = r.RequestValue.Encode()
-				if err == nil {
-					cmpnt, err = wrapTLV(cmpnt,
-						aTag(classC, false,
-							uint32(TagExtendedValue)))
-					if err == nil {
-						enc = append(enc, cmpnt...)
-					}
-				}
-			}
+	if err == nil {
+		enc = append(enc, cmpnt...)
+		if r.RequestValue != nil {
+			cmpnt, err = wrapTLV((*r.RequestValue),
+				aTag(classC, false,
+					uint32(TagExtendedValue)))
 			if err == nil {
-				enc, err = wrapTLV(enc,
-					uSeqTag(),    // SEQUENCE
-					r.classTag()) // [APPLICATION 23]
+				enc = append(enc, cmpnt...)
 			}
+		}
+		if err == nil {
+			enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 23]
 		}
 	}
 
@@ -66,43 +58,24 @@ SEQUENCE.
 */
 func (r *Extended) Decode(enc []byte) error {
 	var err error
-	enc, err = unwrapTLV(enc,
-		r.classTag(), // [APPLICATION 23]
-		uSeqTag())    // SEQUENCE
-
+	enc, err = unwrapTLV(enc, r.classTag()) // [APPLICATION 23]
 	if err == nil {
 		p := 0
-		var payload []byte
-		payload, err = readEPTLV(enc, &p,
-			classC,
-			uint32(TagExtendedName))
 
 		var value []byte
-		if err == nil {
-			p2 := 0
-			value, err = readEPTLV(payload,
-				&p2, classU, uint32(tOct))
-		}
+		value, err = readEPTLV(enc, &p,
+			classC, uint32(TagExtendedName))
 
 		if err == nil {
 			r.RequestName = value
-			if len(payload) < len(enc) {
-				rest := enc[len(payload)+2:] // 2 == header
-
-				p = 0
-				payload, err = readEPTLV(rest,
+			if p < len(enc) {
+				value, err = readEPTLV(enc,
 					&p, classC,
 					uint32(TagExtendedValue))
 
 				if err == nil {
-					p = 0
-					value, err = readEPTLV(payload, &p,
-						classU, uint32(tOct))
-
-					if err == nil {
-						val := OctetString(value)
-						r.RequestValue = &val
-					}
+					val := OctetString(value)
+					r.RequestValue = &val
 				}
 			}
 		}

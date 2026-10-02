@@ -76,8 +76,8 @@ func (_ Search) classTag() Tag  { return aTag(classA, true, uint32(TagSearch)) }
 
 /*
 Encode returns an instance of []byte alongside an error following
-an attempt to encode the contents of the receiver instance as an
-[APPLICATION 3] SEQUENCE.
+an attempt to encode the contents of the receiver instance as
+[APPLICATION 3].
 */
 func (r Search) Encode() ([]byte, error) {
 	var enc []byte
@@ -86,32 +86,31 @@ func (r Search) Encode() ([]byte, error) {
 		var base []byte
 		base, err = r.BaseObject.Encode()
 		if err == nil {
-			enc = append(enc, base...)
-
 			var encDigits, typesOnly []byte
 			encDigits, _ = r.encodeDigits()
 			typesOnly, _ = r.TypesOnly.Encode()
+
+			enc = append(enc, base...)
 			enc = append(enc, encDigits...)
 			enc = append(enc, typesOnly...)
 
+			flt := filterDefaultEncoding
 			if r.Filter != nil {
-				var flt []byte
-				if flt, err = r.Filter.Encode(); err == nil {
-					enc = append(enc, flt...)
-				}
-			}
-
-			if err == nil && len(r.Attributes) > 0 {
-				var sel []byte
-				if sel, err = r.Attributes.Encode(); err == nil {
-					enc = append(enc, sel...)
-				}
+				flt, err = r.Filter.Encode()
 			}
 
 			if err == nil {
-				enc, err = wrapTLV(enc,
-					uSeqTag(),    // SEQUENCE
-					r.classTag()) // [APPLICATION 3]
+				enc = append(enc, flt...)
+				if len(r.Attributes) > 0 {
+					var sel []byte
+					if sel, err = r.Attributes.Encode(); err == nil {
+						enc = append(enc, sel...)
+					}
+				}
+
+				if err == nil {
+					enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 3]
+				}
 			}
 		}
 	}
@@ -122,12 +121,10 @@ func (r Search) Encode() ([]byte, error) {
 /*
 Decode returns an error following an attempt to decode and write
 the input encoding to the receiver instance. The encoding must
-not be truncated, and must bear the [APPLICATION 3] SEQUENCE tag.
+not be truncated, and must bear the [APPLICATION 3] tag.
 */
 func (r *Search) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc,
-		r.classTag(), // [APPLICATION 3]
-		uSeqTag())    // SEQUENCE
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 3]
 
 	if err == nil {
 		p := 0

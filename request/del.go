@@ -26,13 +26,7 @@ an attempt to encode the contents of the receiver instance as an
 [APPLICATION 10] [LDAPDN].
 */
 func (r Del) Encode() ([]byte, error) {
-	var enc []byte
-	payload, err := OctetString(r).Encode()
-	if err == nil {
-		enc, err = wrapTLV(payload, r.classTag()) // [APPLICATION 10]
-	}
-
-	return enc, err
+	return wrapTLV(OctetString(r), r.classTag()) // [APPLICATION 10]
 }
 
 /*
@@ -41,12 +35,9 @@ the input encoding to the receiver instance. The encoding must not
 be truncated, and must bear the [APPLICATION 10] tag.
 */
 func (r *Del) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 10]
+	dec, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 10]
 	if err == nil {
-		var dec OctetString
-		if err = dec.Decode(payload); err == nil {
-			*r = Del(dec)
-		}
+		*r = Del(dec)
 	}
 
 	return err

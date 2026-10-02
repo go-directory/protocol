@@ -130,9 +130,7 @@ func (r ModifyDN) Encode() ([]byte, error) {
 	}
 
 	if err == nil {
-		enc, err = wrapTLV(enc,
-			uSeqTag(),    // SEQUENCE
-			r.classTag()) // [APPLICATION 12]
+		enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 12]
 	}
 
 	return enc, err
@@ -144,9 +142,7 @@ input encoding to the receiver instance. The encoding must not be
 truncated, and must bear the [APPLICATION 12] SEQUENCE tag.
 */
 func (r *ModifyDN) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc,
-		r.classTag(), // [APPLICATION 12]
-		uSeqTag())    // SEQUENCE
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 12]
 
 	if err == nil {
 		p := 0

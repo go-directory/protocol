@@ -23,8 +23,8 @@ func (_ Compare) classTag() Tag  { return aTag(classA, true, uint32(TagCompare))
 
 /*
 Encode returns an instance of []byte alongside an error following
-an attempt to encode the contents of the receiver instance as an
-[APPLICATION 14] SEQUENCE.
+an attempt to encode the contents of the receiver instance as
+[APPLICATION 14].
 */
 func (r Compare) Encode() ([]byte, error) {
 	var outer []byte
@@ -33,7 +33,6 @@ func (r Compare) Encode() ([]byte, error) {
 		var attrs []byte
 		if attrs, err = r.AVA.Encode(); err == nil {
 			outer, err = wrapTLV(append(ldn, attrs...),
-				uSeqTag(),    // SEQUENCE
 				r.classTag()) // [APPLICATION 14]
 		}
 	}
@@ -44,12 +43,10 @@ func (r Compare) Encode() ([]byte, error) {
 /*
 Decode returns an error following an attempt to decode and write
 the input encoding to the receiver instance. The encoding must
-not be truncated, and must bear the [APPLICATION 14] SEQUENCE tag.
+not be truncated, and must bear the [APPLICATION 14] tag.
 */
 func (r *Compare) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc,
-		r.classTag(), // [APPLICATION 14]
-		uSeqTag())    // SEQUENCE
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 14]
 
 	if err == nil {
 		p := 0

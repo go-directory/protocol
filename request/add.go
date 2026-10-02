@@ -21,7 +21,7 @@ func (_ Add) Choice() string { return nameAddChoice }
 func (_ Add) Tag() int       { return TagAdd }
 func (_ Add) classTag() Tag  { return aTag(classA, true, uint32(TagAdd)) }
 
-func (r *Add) Attribute(at AttributeDescription, av []AttributeValue) {
+func (r *Add) Attribute(at AttributeDescription, av ...AttributeValue) {
 	idx := r.Attributes.IndexOf(at)
 	if idx == -1 {
 		idx = len(r.Attributes)
@@ -39,18 +39,19 @@ func (r Add) Encode() ([]byte, error) {
 		var attrs []byte
 		if attrs, err = r.Attributes.Encode(); err == nil {
 			outer, err = wrapTLV(append(ldn, attrs...),
-				uSeqTag(),    // SEQUENCE
 				r.classTag()) // [APPLICATION 8]
+		} else {
+			println("Attrs err: " + err.Error())
 		}
+	} else {
+		println("EntryDN err: " + err.Error())
 	}
 
 	return outer, err
 }
 
 func (r *Add) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc,
-		r.classTag(), // [APPLICATION 8]
-		uSeqTag())    // SEQUENCE
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 8]
 
 	if err == nil {
 		p := 0
@@ -63,8 +64,14 @@ func (r *Add) Decode(enc []byte) error {
 			var atl AttributeList
 			if err = atl.Decode(payload[p:]); err == nil {
 				r.Attributes = atl
+			} else {
+				println("EntryAttrs decode err: " + err.Error())
 			}
+		} else {
+			println("EntryDN decode err: " + err.Error())
 		}
+	} else {
+		println("Add.Decode err: " + err.Error())
 	}
 
 	return err

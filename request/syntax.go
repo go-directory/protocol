@@ -51,6 +51,8 @@ filterDecode is a top-level [Filter] decompiler.
 */
 var filterDecode = syntax.FilterDecode
 
+var filterDefaultEncoding = syntax.FilterDefaultEncoding
+
 func NewInteger(x any) (Integer, error) {
 	i, err := syntax.NewInteger(x)
 	return i, err

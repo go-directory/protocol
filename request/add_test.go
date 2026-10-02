@@ -9,10 +9,7 @@ func ExampleAdd_assembly() {
 		Entry: LDAPDN(`uid=username,ou=accounts,o=acme`),
 	}
 
-	req.Attribute(AttributeDescription(`cn`), []AttributeValue{
-		AttributeValue(`Some Guy`),
-		AttributeValue(`Some Distinguished Guy`),
-	})
+	req.Attribute([]byte(`cn`), []byte(`Some Guy`), []byte(`Some Distinguished Guy`))
 
 	fmt.Printf("dn: %s\n", req.Entry)
 	fmt.Printf("cn: %s, %s\n", req.Attributes[0].Vals[0], req.Attributes[0].Vals[1])

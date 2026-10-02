@@ -9,7 +9,7 @@ package request
 				delete  (1),
 				replace (2),
 				...  },
-		modification    PartialAttribute } }
+			modification    PartialAttribute } }
 
 Modify implements [§ 4.6 of RFC4511].
 
@@ -29,9 +29,9 @@ type Modify struct {
 			...  },
 		modification    PartialAttribute }
 
-ModifyChange describes a single modification to the directory.
-Instances of this kind are found as slice values within the "Changes"
-field of a [Modify] instance.
+ModifyChange describes a single modification to the directory. Instances of
+this kind are found as slice values within the "Changes" field of a [Modify]
+instance.
 
 See [§ 4.6 of RFC4511] for details.
 
@@ -53,16 +53,20 @@ func (_ Modify) classTag() Tag  { return aTag(classA, true, uint32(TagModify)) }
 Add appends an "add changetype" directive to the receiver using the provided
 [AttributeDescription] and [AttributeValue] instances.
 
-At least one (1) [AttributeValue] is required.
+In most scenarios, at least one (1) [AttributeValue] is required.
 */
 func (r *Modify) Add(at AttributeDescription, av ...AttributeValue) {
-	// only add/append types if we provided at least one value
+	idx := r.IndexOf(at, ModifyChangeOperationAdd)
+	if idx == -1 {
+		idx = r.allocateChange(at, ModifyChangeOperationAdd)
+	}
+
 	if len(av) > 0 {
-		idx := r.IndexOf(at, ModifyChangeOperationAdd)
-		if idx == -1 {
-			idx = r.allocateChange(at, ModifyChangeOperationAdd)
-		}
 		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, av...)
+	} else {
+		// the request defines a zero-length value, probably
+		// of the OCTET STRING syntax.
+		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, AttributeValue(``))
 	}
 }
 
@@ -82,6 +86,10 @@ func (r *Modify) Delete(at AttributeDescription, av ...AttributeValue) {
 
 	if len(av) > 0 {
 		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, av...)
+	} else {
+		// the request defines a zero-length value, probably
+		// of the OCTET STRING syntax.
+		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, AttributeValue(``))
 	}
 }
 
@@ -89,16 +97,20 @@ func (r *Modify) Delete(at AttributeDescription, av ...AttributeValue) {
 Replace appends a "replace changetype" directive to the receiver using the provided
 [AttributeDescription] and [AttributeValue] instances.
 
-At least one (1) [AttributeValue] is required.
+In most scenarios, at least one (1) [AttributeValue] is required.
 */
 func (r *Modify) Replace(at AttributeDescription, av ...AttributeValue) {
-	// only add/append types if we provided at least one value
+	idx := r.IndexOf(at, ModifyChangeOperationReplace)
+	if idx == -1 {
+		idx = r.allocateChange(at, ModifyChangeOperationReplace)
+	}
+
 	if len(av) > 0 {
-		idx := r.IndexOf(at, ModifyChangeOperationReplace)
-		if idx == -1 {
-			idx = r.allocateChange(at, ModifyChangeOperationReplace)
-		}
 		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, av...)
+	} else {
+		// the request defines a zero-length value, probably
+		// of the OCTET STRING syntax.
+		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, AttributeValue(``))
 	}
 }
 
@@ -114,7 +126,7 @@ func (r *Modify) allocateChange(at AttributeDescription, op Enumerated) (idx int
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an
-[APPLICATION 6] SEQUENCE.
+[APPLICATION 6].
 */
 func (r Modify) Encode() ([]byte, error) {
 	var out []byte

@@ -38,7 +38,7 @@ a convenient alternative to manual invocation of [syntax.NewInteger].
 */
 func (r *Bind) SetVersion(v int) {
 	version, _ := NewInteger(v)
-	if (version.Ge(LBBindVersion) && version.Le(UBBindVersion)) {
+	if version.Ge(LBBindVersion) && version.Le(UBBindVersion) {
 		r.Version = version
 	}
 }
@@ -48,20 +48,20 @@ SimpleBind returns an instance of [Bind] in the context of a "simple"
 [AuthenticationChoice]. Successful use of this method will return the
 following structure:
 
-  Bind{
-        Version: 3,
-        Name: LDAPDN(<the bind dn>),                      // LDAPDN (OCTET STRING)
-        Authentication: SimpleCredentials(<the bind pw>), // Authentication CHOICE [0], OCTET STRING
-  }
+	Bind{
+	      Version: 3,
+	      Name: LDAPDN(<the bind dn>),                      // LDAPDN (OCTET STRING)
+	      Authentication: SimpleCredentials(<the bind pw>), // Authentication CHOICE [0], OCTET STRING
+	}
 */
 func SimpleBind(bdn LDAPDN, bpw SimpleCredentials) Bind {
-        req := Bind{
-                Name: bdn,
-                Authentication: bpw,
-        }
-        req.SetVersion(3)
+	req := Bind{
+		Name:           bdn,
+		Authentication: bpw,
+	}
+	req.SetVersion(3)
 
-        return req
+	return req
 }
 
 func (_ Bind) IsProtocolOp()  {}
@@ -93,7 +93,7 @@ func (r Bind) Encode() ([]byte, error) {
 			if err == nil {
 				enc = append(enc, payload...)
 				enc, err = wrapTLV(enc,
-					uSeqTag(),    // SEQUENCE
+					//uSeqTag(),    // SEQUENCE
 					r.classTag()) // [APPLICATION 0]
 			}
 		}
@@ -109,8 +109,8 @@ not be truncated, and must bear the [APPLICATION 0] SEQUENCE tag.
 */
 func (r *Bind) Decode(enc []byte) error {
 	payload, err := unwrapTLV(enc,
-		r.classTag(), // [APPLICATION 0]
-		uSeqTag())    // SEQUENCE
+		r.classTag()) // [APPLICATION 0]
+	//uSeqTag())    // SEQUENCE
 
 	if err == nil {
 		p := 0
@@ -265,10 +265,10 @@ an attempt to encode the contents of the receiver instance within
 a CONTEXT-SPECIFIC tag of [0], per [AuthenticationChoice].
 */
 func (r SimpleCredentials) Encode() ([]byte, error) {
-	enc, err := OctetString(r).Encode()
-	if err == nil {
-		enc, err = wrapTLV(enc, r.classTag()) // CONTEXT-SPECIFIC [0]
-	}
+	//enc, err := OctetString(r).Encode()
+	//if err == nil {
+	enc, err := wrapTLV(r, r.classTag()) // CONTEXT-SPECIFIC [0]
+	//}
 
 	return enc, err
 }
@@ -322,7 +322,9 @@ Encode returns an instance of []byte alongside an error following an
 attempt to encode the contents of the receiver instance as an
 [APPLICATION 2] NULL context.
 */
-func (r Unbind) Encode() ([]byte, error) { return Null(r).cast().Encode() }
+func (r Unbind) Encode() ([]byte, error) {
+	return wrapTLV([]byte{}, aTag(classA, false, uint32(2)))
+}
 
 /*
 Decode returns an error following an attempt to decode and write the
@@ -330,6 +332,6 @@ input encoding to the receiver instance. The encoding must not be
 truncated, and must bear the [APPLICATION 2] NULL tag.
 */
 func (r *Unbind) Decode(enc []byte) error {
-	N := Null(*r).cast()
-	return N.Decode(enc)
+	_, err := unwrapTLV(enc, aTag(classA, false, uint32(2)))
+	return err
 }
