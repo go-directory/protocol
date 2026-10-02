@@ -40,11 +40,7 @@ func (r Add) Encode() ([]byte, error) {
 		if attrs, err = r.Attributes.Encode(); err == nil {
 			outer, err = wrapTLV(append(ldn, attrs...),
 				r.classTag()) // [APPLICATION 8]
-		} else {
-			println("Attrs err: " + err.Error())
 		}
-	} else {
-		println("EntryDN err: " + err.Error())
 	}
 
 	return outer, err
@@ -64,14 +60,8 @@ func (r *Add) Decode(enc []byte) error {
 			var atl AttributeList
 			if err = atl.Decode(payload[p:]); err == nil {
 				r.Attributes = atl
-			} else {
-				println("EntryAttrs decode err: " + err.Error())
 			}
-		} else {
-			println("EntryDN decode err: " + err.Error())
 		}
-	} else {
-		println("Add.Decode err: " + err.Error())
 	}
 
 	return err
