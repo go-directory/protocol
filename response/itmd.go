@@ -22,11 +22,12 @@ func (_ Intermediate) IsResponseOp()  {}
 func (_ Intermediate) classTag() Tag {
 	return aTag(classA, true, uint32(TagIntermediate))
 }
+func (r Intermediate) Result() Enumerated { return 0 }
 
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as
-[APPLICATION 25], circumscribing a SEQUENCE.
+[APPLICATION 25].
 */
 func (r Intermediate) Encode() ([]byte, error) {
 	var enc []byte
@@ -58,9 +59,7 @@ func (r Intermediate) Encode() ([]byte, error) {
 	}
 
 	if err == nil {
-		enc, err = wrapTLV(enc,
-			uSeqTag(),    // SEQUENCE
-			r.classTag()) // [APPLICATION 23]
+		enc, err = wrapTLV(enc,	r.classTag()) // [APPLICATION 23]
 	}
 
 	return enc, err
@@ -71,9 +70,7 @@ Decode returns an error following an attempt to decode and write the
 input encoding to the receiver instance
 */
 func (r *Intermediate) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc,
-		r.classTag(), // [APPLICATION 23]
-		uSeqTag())    // SEQUENCE
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 23]
 
 	ct := 0
 	if len(payload) > 0 && err == nil {

@@ -98,7 +98,7 @@ func (r LDAPResult) Encode() ([]byte, error) {
 			diag, err = OctetString(r.DiagnosticMessage).Encode()
 			if err == nil {
 				payload = append(payload, diag...)
-				if r.Referral != nil {
+				if len((*r.Referral)) > 0 {
 					var refs []byte
 					refs, err = r.Referral.Encode() // SEQUENCE OF
 					if err == nil {

@@ -15,6 +15,7 @@ func (_ ModifyDN) Tag() int       { return TagModifyDN }
 func (_ ModifyDN) IsProtocolOp()  {}
 func (_ ModifyDN) IsResponseOp()  {}
 func (_ ModifyDN) classTag() Tag  { return aTag(classA, true, uint32(TagModifyDN)) }
+func (r ModifyDN) Result() Enumerated { return LDAPResult(r).ResultCode }
 
 /*
 Encode returns an instance of []byte alongside an error following

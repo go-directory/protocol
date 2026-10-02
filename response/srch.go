@@ -22,6 +22,7 @@ func (_ SearchResultEntry) Tag() int       { return TagSearchResultEntry }
 func (_ SearchResultEntry) classTag() Tag {
 	return aTag(classA, true, uint32(TagSearchResultEntry))
 }
+func (r SearchResultEntry) Result() Enumerated { return 0 }
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -88,6 +89,7 @@ func (_ SearchResultReference) Tag() int       { return TagSearchResultReference
 func (_ SearchResultReference) classTag() Tag {
 	return aTag(classA, true, uint32(TagSearchResultReference))
 }
+func (r SearchResultReference) Result() Enumerated { return 0 }
 
 /*
 Encode returns an instance of []byte alongside an error following
@@ -143,6 +145,7 @@ func (_ SearchResultDone) IsProtocolOp()  {}
 func (_ SearchResultDone) IsResponseOp()  {}
 func (_ SearchResultDone) Tag() int       { return TagSearchResultDone }
 func (_ SearchResultDone) classTag() Tag  { return aTag(classA, true, uint32(TagSearchResultDone)) }
+func (r SearchResultDone) Result() Enumerated { return LDAPResult(r).ResultCode }
 
 /*
 Encode returns an instance of []byte alongside an error following

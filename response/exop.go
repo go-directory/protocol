@@ -19,7 +19,7 @@ type Extended struct {
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an
-[APPLICATION 24] tag, circumscribing a SEQUENCE.
+[APPLICATION 24] tag.
 */
 func (r Extended) Encode() ([]byte, error) {
 	var enc []byte
@@ -32,10 +32,10 @@ func (r Extended) Encode() ([]byte, error) {
 		res, err = unwrapTLV(res, uSeqTag())
 		if err == nil {
 			enc = append(enc, res...)
-			if r.ResponseName != nil {
-				res, err = r.ResponseName.Encode()
+			if len((*r.ResponseName)) > 0 {
+				//res, err = r.ResponseName.Encode()
 				if err == nil {
-					res, err = wrapTLV(res,
+					res, err = wrapTLV((*r.ResponseName),
 						aTag(classC, false,
 							uint32(TagExtendedName)))
 					if err == nil {
@@ -44,22 +44,20 @@ func (r Extended) Encode() ([]byte, error) {
 				}
 			}
 
-			if r.ResponseValue != nil {
-				res, err = r.ResponseValue.Encode()
-				if err == nil {
-					res, err = wrapTLV(res,
+			if len((*r.ResponseValue)) > 0 && err == nil {
+				//res, err = r.ResponseValue.Encode()
+				//if err == nil {
+					res, err = wrapTLV((*r.ResponseValue),
 						aTag(classC, false,
 							uint32(TagExtendedValue)))
 					if err == nil {
 						enc = append(enc, res...)
 					}
-				}
+				//}
 			}
 
 			if err == nil {
-				enc, err = wrapTLV(enc,
-					uSeqTag(),    // SEQUENCE
-					r.classTag()) // [APPLICATION 24]
+				enc, err = wrapTLV(enc,	r.classTag()) // [APPLICATION 24]
 			}
 		}
 	}
@@ -74,9 +72,7 @@ truncated and must bear the [APPLICATION 24] tag, circumscribing a
 SEQUENCE.
 */
 func (r *Extended) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc,
-		r.classTag(), // [APPLICATION 24]
-		uSeqTag())    // SEQUENCE
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 24]
 
 	if err == nil {
 		var p int
@@ -84,19 +80,15 @@ func (r *Extended) Decode(enc []byte) error {
 		for p < len(payload) && err == nil {
 			tag, _ := readTag(payload[p:])
 			var res []byte
-			res, err = readEPTLV(payload, &p,
-				classC, tag.Tag)
-
+			res, err = readEPTLV(payload, &p, classC, tag.Tag)
 			if err == nil {
 				switch tag.Tag {
 				case TagExtendedName:
-					var loid LDAPOID
-					err = loid.Decode(res)
+					loid := LDAPOID(res)
 					r.ResponseName = &loid
 
 				case TagExtendedValue:
-					var val OctetString
-					err = val.Decode(res)
+					val := OctetString(res)
 					r.ResponseValue = &val
 				}
 			}
@@ -112,6 +104,7 @@ func (_ Extended) Tag() int       { return TagExtended }
 func (_ Extended) IsProtocolOp()  {}
 func (_ Extended) IsResponseOp()  {}
 func (_ Extended) classTag() Tag  { return aTag(classA, true, uint32(TagExtended)) }
+func (r Extended) Result() Enumerated { return r.LDAPResult.ResultCode }
 
 /*
 Extended Response tags.

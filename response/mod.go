@@ -15,6 +15,7 @@ func (_ Modify) Kind() string   { return `response` }
 func (_ Modify) Choice() string { return nameModifyChoice }
 func (_ Modify) Tag() int       { return TagModify }
 func (_ Modify) classTag() Tag  { return aTag(classA, true, uint32(TagModify)) }
+func (r Modify) Result() Enumerated { return LDAPResult(r).ResultCode }
 
 /*
 Encode returns an instance of []byte alongside an error following

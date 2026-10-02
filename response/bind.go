@@ -20,11 +20,12 @@ func (_ Bind) Tag() int       { return TagBind }
 func (_ Bind) Kind() string   { return `response` }
 func (_ Bind) Choice() string { return nameBindChoice }
 func (_ Bind) classTag() Tag  { return aTag(classA, true, uint32(TagBind)) }
+func (r Bind) Result() Enumerated { return r.LDAPResult.ResultCode }
 
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance within
-an [APPLICATION 1] SEQUENCE tag.
+an [APPLICATION 1] tag.
 */
 func (r Bind) Encode() ([]byte, error) {
 	var enc []byte
@@ -37,7 +38,7 @@ func (r Bind) Encode() ([]byte, error) {
 		res, err = unwrapTLV(res, uSeqTag())
 		if err == nil {
 			enc = append(enc, res...)
-			if r.ServerSaslCreds != nil {
+			if len((*r.ServerSaslCreds)) > 0 {
 				res, err = r.ServerSaslCreds.Encode()
 				if err == nil {
 					res, err = wrapTLV(res,
@@ -50,9 +51,7 @@ func (r Bind) Encode() ([]byte, error) {
 			}
 
 			if err == nil {
-				enc, err = wrapTLV(enc,
-					uSeqTag(),    // SEQUENCE
-					r.classTag()) // [APPLICATION 1]
+				enc, err = wrapTLV(enc,	r.classTag()) // [APPLICATION 1]
 			}
 		}
 	}
@@ -63,25 +62,26 @@ func (r Bind) Encode() ([]byte, error) {
 /*
 Decode returns an error following an attempt to decode and write
 the input encoding to the receiver instance.  The encoding must
-not be truncated and must bear the [APPLICATION 1] SEQUENCE tag.
+not be truncated and must bear the [APPLICATION 1] tag.
 */
 func (r *Bind) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc,
-		r.classTag(), // [APPLICATION 1]
-		uSeqTag())    // SEQUENCE
+	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 1]
 
 	if err == nil {
 		var p int
 		if p, err = r.LDAPResult.setComponentsOf(payload); err == nil {
-			var res []byte
-			res, err = unwrapTLV(payload[p:],
-				aTag(classC, false,
-					uint32(TagBindServerSaslCreds)))
+			rest := payload[p:]
+			if len(rest) > 0 {
+				var res []byte
+				res, err = unwrapTLV(rest,
+					aTag(classC, false,
+						uint32(TagBindServerSaslCreds)))
 
-			if err == nil {
-				var creds OctetString
-				if err = creds.Decode(res); err == nil {
-					r.ServerSaslCreds = &creds
+				if err == nil {
+					var creds OctetString
+					if err = creds.Decode(res); err == nil {
+						r.ServerSaslCreds = &creds
+					}
 				}
 			}
 		}

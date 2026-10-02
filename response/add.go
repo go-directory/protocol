@@ -15,6 +15,7 @@ func (_ Add) Kind() string   { return `response` }
 func (_ Add) Choice() string { return nameAddChoice }
 func (_ Add) Tag() int       { return TagAdd }
 func (_ Add) classTag() Tag  { return aTag(classA, true, uint32(TagAdd)) }
+func (r Add) Result() Enumerated { return LDAPResult(r).ResultCode }
 
 func (r Add) Encode() ([]byte, error) {
 	var enc []byte

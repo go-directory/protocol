@@ -8,6 +8,7 @@ types defined throughout the subsections of [§ 4.1 of RFC4511].
 */
 type Response interface {
 	Encode() ([]byte, error)
+	Result() Enumerated
 	Choice() string
 	Kind() string
 	Tag() int
