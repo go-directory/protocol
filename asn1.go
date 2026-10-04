@@ -48,6 +48,6 @@ const (
 private asn1.Tag<X> aliases. Same deal as above.
 */
 const (
-	tInt  = asn1.TagInteger          // 0x02, 2
-	tSeq  = asn1.TagSequence         // 0x10, 16
+	tInt = asn1.TagInteger  // 0x02, 2
+	tSeq = asn1.TagSequence // 0x10, 16
 )

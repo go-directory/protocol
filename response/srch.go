@@ -39,25 +39,21 @@ type SearchResponse interface {
 	// ProtocolOp and Response interface types.
 	Tag() int
 
-	// SearchResultEntry is called by the client when the polling
+	// Entry is called by the client when the polling
 	// retrieved entries asynchronously. Any Subsequent call of this
 	// method are contingent upon the SearchAsyncResult.Next method
 	// returning a value of true.
-	SearchResultEntry() *SearchResultEntry
-
-	// SearchResultEntries returns slices of *SearchResultEntry
-	// instances, and is only used for synchronous search requests.
-	SearchResultEntries() []*SearchResultEntry
+	Entry() *SearchResultEntry
 
 	// SearchResultReference contains slices of URI values, each
 	// representing a referral returned by the DSA.
-	SearchResultReference() *SearchResultReference
+	Reference() *SearchResultReference
 
 	// SearchResultDone circumscribes an instance of LDAPResult,
 	// and serves as an indicator as to whether the search was
 	// completed successfully and, if not, what result codes were
 	// returned by the DSA.
-	SearchResultDone() *SearchResultDone
+	Done() *SearchResultDone
 
 	// Controls returns an instance of Controls, containing zero (0)
 	// or more Control SEQUENCE instances the DSA has returned while
@@ -127,16 +123,20 @@ func (_ SearchAsyncResult) IsProtocolOp()                      {}
 func (_ SearchAsyncResult) IsResponseOp()                      {}
 func (_ SearchAsyncResult) Result() Enumerated                 { return -1 }
 func (r SearchAsyncResult) Error() error                       { return r.err }
+func (r SearchAsyncResult) Chan() chan *SearchResultEntry      { return r.asyncE }
 func (r SearchAsyncResult) Controls() Controls                 { return r.ctrls }
-func (r *SearchAsyncResult) Entry() *SearchResultEntry         { return r.entry }
-func (r *SearchAsyncResult) Reference() *SearchResultReference { return r.referral }
-func (r *SearchAsyncResult) Done() *SearchResultDone           { return r.done }
+func (r SearchAsyncResult) Entry() *SearchResultEntry          { return r.entry }
+func (r SearchAsyncResult) Reference() *SearchResultReference  { return r.referral }
+func (r SearchAsyncResult) Done() *SearchResultDone            { return r.done }
 func (r *SearchAsyncResult) SetError(err error)                { r.err = err }
 func (r *SearchAsyncResult) AddControl(ctrl Control)           { r.ctrls.Append(ctrl) }
 func (r *SearchAsyncResult) SetDone(done *SearchResultDone)    { r.done = done }
 
 func (r *SearchAsyncResult) Next() bool {
 	var is bool
+	if r == nil {
+		return is
+	}
 	res, ok := <-r.asyncE
 	if !ok || res == nil {
 		return is
@@ -150,9 +150,13 @@ func (r *SearchAsyncResult) Next() bool {
 	return is
 }
 
-func NewSearchAsyncResult() SearchAsyncResult {
+func NewSearchAsyncResult(size ...int) SearchAsyncResult {
+	bsize := 0
+	if len(size) > 0 && size[0] > 0 {
+		bsize = size[0]
+	}
 	return SearchAsyncResult{
-		asyncE:   make(chan *SearchResultEntry, 0), // should be buffer-able
+		asyncE:   make(chan *SearchResultEntry, bsize),
 		referral: new(SearchResultReference),
 		ctrls:    make(Controls, 0),
 	}
@@ -188,13 +192,16 @@ func (_ SearchSyncResult) Choice() string                                 { retu
 func (_ SearchSyncResult) IsProtocolOp()                                  {}
 func (_ SearchSyncResult) IsResponseOp()                                  {}
 func (_ SearchSyncResult) Result() Enumerated                             { return -1 }
-func (_ *SearchSyncResult) SearchResultEntry() *SearchResultEntry         { return nil }
-func (_ *SearchSyncResult) SearchResultReference() *SearchResultReference { return nil }
-func (_ *SearchSyncResult) SearchResultDone() *SearchResultDone           { return nil }
-func (_ *SearchSyncResult) Error() error                                  { return nil }
+func (_ SearchSyncResult) Error() error                                   { return nil }
 func (_ *SearchSyncResult) Next() bool                                    { return false }
-func (r SearchSyncResult) Controls() Controls                             { return r.ctrls }
+func (_ *SearchSyncResult) SetDone(_ *SearchResultDone)    		  {}
+func (_ *SearchSyncResult) SetError(_ error)                		  {}
 func (r *SearchSyncResult) AddControl(ctrl Control)                       { r.ctrls.Append(ctrl) }
+func (r SearchSyncResult) Entry() *SearchResultEntry         		  { return nil }
+func (r SearchSyncResult) Reference() *SearchResultReference 		  { return nil }
+func (r SearchSyncResult) Controls() Controls                             { return r.ctrls }
+func (r SearchSyncResult) Chan() chan *SearchResultEntry      		  { return nil }
+func (r SearchSyncResult) Done() *SearchResultDone           		  { return nil }
 
 func NewSearchSyncResult() SearchSyncResult {
 	return SearchSyncResult{
