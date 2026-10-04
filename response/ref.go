@@ -10,10 +10,10 @@ Referral implements [§ 4.1.10 of RFC4511].
 type Referral []URI
 
 /*
-Tag returns 0x10 (16) for SEQUENCE OF.
+Append appends an instance of [URI] to the receiver instance. Note that uniqueness
+checks are not conducted for this operation.
 */
-func (_ Referral) Tag() int      { return int(tSeq) }
-func (_ Referral) classTag() Tag { return aTag(classU, true, uint32(tSeq)) }
+func (r *Referral) Append(u URI) { *r = append(*r, u) }
 
 func (r Referral) Encode() ([]byte, error) {
 	// Create slice of encoded URIs
