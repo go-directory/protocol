@@ -164,11 +164,11 @@ SimpleBind returns an instance of [BindRequest] in the context of a
 "simple" [request.AuthenticationChoice]. Successful use of this method
 will return the following structure:
 
-  BindRequest{
-	Version: 3,
-	Name: LDAPDN(<the bind dn>),	     		  // LDAPDN (OCTET STRING)
-	Authentication: SimpleCredentials(<the bind pw>), // Authentication CHOICE [0], OCTET STRING
-  }
+	  BindRequest{
+		Version: 3,
+		Name: LDAPDN(<the bind dn>),	     		  // LDAPDN (OCTET STRING)
+		Authentication: SimpleCredentials(<the bind pw>), // Authentication CHOICE [0], OCTET STRING
+	  }
 */
 var SimpleBind = request.SimpleBind
 
