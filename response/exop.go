@@ -47,17 +47,17 @@ func (r Extended) Encode() ([]byte, error) {
 			if len((*r.ResponseValue)) > 0 && err == nil {
 				//res, err = r.ResponseValue.Encode()
 				//if err == nil {
-					res, err = wrapTLV((*r.ResponseValue),
-						aTag(classC, false,
-							uint32(TagExtendedValue)))
-					if err == nil {
-						enc = append(enc, res...)
-					}
+				res, err = wrapTLV((*r.ResponseValue),
+					aTag(classC, false,
+						uint32(TagExtendedValue)))
+				if err == nil {
+					enc = append(enc, res...)
+				}
 				//}
 			}
 
 			if err == nil {
-				enc, err = wrapTLV(enc,	r.classTag()) // [APPLICATION 24]
+				enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 24]
 			}
 		}
 	}
@@ -98,12 +98,12 @@ func (r *Extended) Decode(enc []byte) error {
 	return err
 }
 
-func (_ Extended) Kind() string   { return `response` }
-func (_ Extended) Choice() string { return nameExtendedChoice }
-func (_ Extended) Tag() int       { return TagExtended }
-func (_ Extended) IsProtocolOp()  {}
-func (_ Extended) IsResponseOp()  {}
-func (_ Extended) classTag() Tag  { return aTag(classA, true, uint32(TagExtended)) }
+func (_ Extended) Kind() string       { return `response` }
+func (_ Extended) Choice() string     { return nameExtendedChoice }
+func (_ Extended) Tag() int           { return TagExtended }
+func (_ Extended) IsProtocolOp()      {}
+func (_ Extended) IsResponseOp()      {}
+func (_ Extended) classTag() Tag      { return aTag(classA, true, uint32(TagExtended)) }
 func (r Extended) Result() Enumerated { return r.LDAPResult.ResultCode }
 
 /*

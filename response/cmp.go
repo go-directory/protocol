@@ -9,12 +9,12 @@ Compare implements [§ 4.10 of RFC4511].
 */
 type Compare LDAPResult
 
-func (_ Compare) Kind() string   { return `response` }
-func (_ Compare) Choice() string { return nameCompareChoice }
-func (_ Compare) Tag() int       { return TagCompare }
-func (_ Compare) IsProtocolOp()  {}
-func (_ Compare) IsResponseOp()  {}
-func (_ Compare) classTag() Tag  { return aTag(classA, true, uint32(TagCompare)) }
+func (_ Compare) Kind() string       { return `response` }
+func (_ Compare) Choice() string     { return nameCompareChoice }
+func (_ Compare) Tag() int           { return TagCompare }
+func (_ Compare) IsProtocolOp()      {}
+func (_ Compare) IsResponseOp()      {}
+func (_ Compare) classTag() Tag      { return aTag(classA, true, uint32(TagCompare)) }
 func (r Compare) Result() Enumerated { return LDAPResult(r).ResultCode }
 
 /*

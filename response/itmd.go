@@ -59,7 +59,7 @@ func (r Intermediate) Encode() ([]byte, error) {
 	}
 
 	if err == nil {
-		enc, err = wrapTLV(enc,	r.classTag()) // [APPLICATION 23]
+		enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 23]
 	}
 
 	return enc, err

@@ -14,12 +14,12 @@ type Bind struct {
 	ServerSaslCreds *OctetString
 }
 
-func (_ Bind) IsProtocolOp()  {}
-func (_ Bind) IsResponseOp()  {}
-func (_ Bind) Tag() int       { return TagBind }
-func (_ Bind) Kind() string   { return `response` }
-func (_ Bind) Choice() string { return nameBindChoice }
-func (_ Bind) classTag() Tag  { return aTag(classA, true, uint32(TagBind)) }
+func (_ Bind) IsProtocolOp()      {}
+func (_ Bind) IsResponseOp()      {}
+func (_ Bind) Tag() int           { return TagBind }
+func (_ Bind) Kind() string       { return `response` }
+func (_ Bind) Choice() string     { return nameBindChoice }
+func (_ Bind) classTag() Tag      { return aTag(classA, true, uint32(TagBind)) }
 func (r Bind) Result() Enumerated { return r.LDAPResult.ResultCode }
 
 /*
@@ -51,7 +51,7 @@ func (r Bind) Encode() ([]byte, error) {
 			}
 
 			if err == nil {
-				enc, err = wrapTLV(enc,	r.classTag()) // [APPLICATION 1]
+				enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 1]
 			}
 		}
 	}

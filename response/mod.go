@@ -9,12 +9,12 @@ Modify implements [§ 4.6 of RFC4511], circumscribing an [LDAPResult].
 */
 type Modify LDAPResult
 
-func (_ Modify) IsProtocolOp()  {}
-func (_ Modify) IsResponseOp()  {}
-func (_ Modify) Kind() string   { return `response` }
-func (_ Modify) Choice() string { return nameModifyChoice }
-func (_ Modify) Tag() int       { return TagModify }
-func (_ Modify) classTag() Tag  { return aTag(classA, true, uint32(TagModify)) }
+func (_ Modify) IsProtocolOp()      {}
+func (_ Modify) IsResponseOp()      {}
+func (_ Modify) Kind() string       { return `response` }
+func (_ Modify) Choice() string     { return nameModifyChoice }
+func (_ Modify) Tag() int           { return TagModify }
+func (_ Modify) classTag() Tag      { return aTag(classA, true, uint32(TagModify)) }
 func (r Modify) Result() Enumerated { return LDAPResult(r).ResultCode }
 
 /*

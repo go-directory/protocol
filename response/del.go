@@ -9,12 +9,12 @@ Del implements [§ 4.8 of RFC4511], circumscribing an [LDAPResult].
 */
 type Del LDAPResult
 
-func (_ Del) Kind() string   { return `response` }
-func (_ Del) Choice() string { return nameDelChoice }
-func (_ Del) Tag() int       { return TagDel }
-func (_ Del) IsProtocolOp()  {}
-func (_ Del) IsResponseOp()  {}
-func (_ Del) classTag() Tag  { return aTag(classA, true, uint32(TagDel)) }
+func (_ Del) Kind() string       { return `response` }
+func (_ Del) Choice() string     { return nameDelChoice }
+func (_ Del) Tag() int           { return TagDel }
+func (_ Del) IsProtocolOp()      {}
+func (_ Del) IsResponseOp()      {}
+func (_ Del) classTag() Tag      { return aTag(classA, true, uint32(TagDel)) }
 func (r Del) Result() Enumerated { return LDAPResult(r).ResultCode }
 
 /*

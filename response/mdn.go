@@ -9,12 +9,12 @@ ModifyDN implements [§ 4.9 of RFC4511], circumscribing an [LDAPResult].
 */
 type ModifyDN LDAPResult
 
-func (_ ModifyDN) Kind() string   { return `response` }
-func (_ ModifyDN) Choice() string { return nameModifyDNChoice }
-func (_ ModifyDN) Tag() int       { return TagModifyDN }
-func (_ ModifyDN) IsProtocolOp()  {}
-func (_ ModifyDN) IsResponseOp()  {}
-func (_ ModifyDN) classTag() Tag  { return aTag(classA, true, uint32(TagModifyDN)) }
+func (_ ModifyDN) Kind() string       { return `response` }
+func (_ ModifyDN) Choice() string     { return nameModifyDNChoice }
+func (_ ModifyDN) Tag() int           { return TagModifyDN }
+func (_ ModifyDN) IsProtocolOp()      {}
+func (_ ModifyDN) IsResponseOp()      {}
+func (_ ModifyDN) classTag() Tag      { return aTag(classA, true, uint32(TagModifyDN)) }
 func (r ModifyDN) Result() Enumerated { return LDAPResult(r).ResultCode }
 
 /*
