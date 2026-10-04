@@ -125,7 +125,7 @@ func (_ SearchAsyncResult) Kind() string                       { return `async` 
 func (_ SearchAsyncResult) Choice() string                     { return `searchResults` }
 func (_ SearchAsyncResult) IsProtocolOp()                      {}
 func (_ SearchAsyncResult) IsResponseOp()                      {}
-func (_ SearchAsyncResult) Result() int                        { return -1 }
+func (_ SearchAsyncResult) Result() Enumerated                 { return -1 }
 func (r SearchAsyncResult) Error() error                       { return r.err }
 func (r SearchAsyncResult) Controls() Controls                 { return r.ctrls }
 func (r *SearchAsyncResult) Entry() *SearchResultEntry         { return r.entry }
@@ -187,7 +187,7 @@ func (_ SearchSyncResult) Kind() string                                   { retu
 func (_ SearchSyncResult) Choice() string                                 { return `searchResults` }
 func (_ SearchSyncResult) IsProtocolOp()                                  {}
 func (_ SearchSyncResult) IsResponseOp()                                  {}
-func (_ SearchSyncResult) Result() int                                    { return -1 }
+func (_ SearchSyncResult) Result() Enumerated                             { return -1 }
 func (_ *SearchSyncResult) SearchResultEntry() *SearchResultEntry         { return nil }
 func (_ *SearchSyncResult) SearchResultReference() *SearchResultReference { return nil }
 func (_ *SearchSyncResult) SearchResultDone() *SearchResultDone           { return nil }
