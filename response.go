@@ -74,8 +74,8 @@ LDAPResult implements [§ 4.1.9 of RFC4511]. See also the LDAP result code const
 type LDAPResult = response.LDAPResult
 
 var (
-        responseDecode      = response.Decode
-        responseDecodeByTag = response.DecodeByTag
+	responseDecode      = response.Decode
+	responseDecodeByTag = response.DecodeByTag
 )
 
 /*
@@ -85,7 +85,7 @@ It is used by the DSA to respond to a request for StartTLS.
 [§ 4.14.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.14.2
 */
 var StartTLSResponse = ExtendedResponse{
-        ResponseName: &response.NoticeOfStartTLS,
+	ResponseName: &response.NoticeOfStartTLS,
 }
 
 /*
@@ -185,6 +185,14 @@ Modify implements [§ 4.6 of RFC4511], circumscribing an [LDAPResult].
 type ModifyResponse = response.Modify
 
 /*
+SearchResponse implements the [Response] interface type, and serves to unify both
+[SearchSyncResult] and [SearchAsyncResult] search result types. It does not extend
+from any standard and is merely implemented for convenience with respect to message
+handling by the DUA.
+*/
+type SearchResponse = response.Search
+
+/*
 	SearchResultDone ::= [APPLICATION 5] LDAPResult
 
 SearchResultDone implements [§ 4.5.2 of RFC4511], circumscribing
@@ -213,3 +221,15 @@ SearchResultEntry implements [§ 4.5.2 of RFC4511].
 [§ 4.5.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.2
 */
 type SearchResultEntry = response.SearchResultEntry
+
+/*
+SearchSyncResult implements [Response] and [SearchResponse] interface types, and
+is intended for use as the return value following a synchronous search call.
+*/
+type SearchSyncResult = response.SearchSyncResult
+
+/*
+SearchAsyncResult implements [Response] and [SearchResponse] interface types, and
+is intended for use as the return value following an asynchronous search call.
+*/
+type SearchAsyncResult = response.SearchAsyncResult

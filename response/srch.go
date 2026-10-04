@@ -5,16 +5,17 @@ import (
 )
 
 /*
-SearchResponse defines a convenient [Response] subset, and is meant to
-operate based on delivered [SearchResultEntry], [SearchResultReference]
+Search implements, and is a subset of, the [Response] interface type. It
+is meant to operate based on [SearchResultEntry], [SearchResultReference]
 and [SearchResultDone] [LDAPResult] payloads. This type does not extend
 from any formal standard and is implemented here merely as a supplement
 of the DUA.
 
-Concrete implementations of this interface are [SearchSyncResult] and
-[SearchAsyncResult] for synchronous or asynchronous requests respectively.
+Concrete implementations of this interface are the [SearchSyncResult] and
+[SearchAsyncResult] types for synchronous or asynchronous search requests
+respectively.
 */
-type SearchResponse interface {
+type Search interface {
 	// Encode serves no useful purpose, and exists only to satisfy
 	// Go's interface signature requirements with respect to the
 	// Response interface type.
@@ -39,20 +40,26 @@ type SearchResponse interface {
 	// ProtocolOp and Response interface types.
 	Tag() int
 
-	// Entry is called by the client when the polling
-	// retrieved entries asynchronously. Any Subsequent call of this
-	// method are contingent upon the SearchAsyncResult.Next method
+	// Chan returns the underlying search result entry channel
+	// instance. This is meant solely for asynchronous operations
+	// and will return nil otherwise.
+	Chan() chan *SearchResultEntry
+
+	// Entry is called by the client when the polling retrieved
+	// entries asynchronously. Any Subsequent call of this method
+	// are contingent upon the SearchAsyncResult.Next method
 	// returning a value of true.
 	Entry() *SearchResultEntry
 
-	// SearchResultReference contains slices of URI values, each
-	// representing a referral returned by the DSA.
+	// Reference contains slices of URI values, each representing a
+	// referral returned by the DSA.
 	Reference() *SearchResultReference
 
-	// SearchResultDone circumscribes an instance of LDAPResult,
-	// and serves as an indicator as to whether the search was
-	// completed successfully and, if not, what result codes were
-	// returned by the DSA.
+	// Done circumscribes an instance of LDAPResult  and serves as an
+	// indicator as to whether the search was completed successfully
+	// and, if not, what result codes were returned by the DSA. This
+	// is meant solely for asynchronous operations and will return nil
+	// otherwise.
 	Done() *SearchResultDone
 
 	// Controls returns an instance of Controls, containing zero (0)
@@ -61,9 +68,8 @@ type SearchResponse interface {
 	Controls() Controls
 
 	// Error returns an error, or nil if no error has been raised.
-	// This method only applies to SearchAsyncResult instances,
-	// and will always return nil when called via SearchSyncResult
-	// instances.
+	// This method only applies to asynchronous instances, and will
+	// always return nil otherwise.
 	Error() error
 
 	// Next returns a Boolean value indicative of a successful
@@ -73,9 +79,8 @@ type SearchResponse interface {
 	// means SearchResultDone was received, or that there was an
 	// unrecoverable error of some kind during receipt of entries.
 	//
-	// Note this method is only meaningful for SearchAsyncResult
-	// instances. It will always return false via SearchSyncResult
-	// instance calls.
+	// Note this method is only meaningful for asynchronous instances,
+	// and will always return false otherwise.
 	Next() bool
 
 	IsProtocolOp() // marker method
@@ -89,8 +94,10 @@ type (
 )
 
 /*
-SearchAsyncResult is a [Response] implementation type intended for
-use as a return value following an asynchronous search request.
+SearchAsyncResult is a [Search] and [Response] implementation type intended for
+use as a return value following an asynchronous search request. It stores response
+[Control] instances, *[SearchResultReference], a *[SearchResultEntry] channel
+and other components needed to successfully manage a stream of entries.
 */
 type SearchAsyncResult struct {
 	ctrls    Controls
@@ -105,32 +112,32 @@ type SearchAsyncResult struct {
 /*
 Encode returns a nil []byte instance alongside an error. This method serves no
 useful purpose and only exists to satify Go's interface signature requirements
-with respect to the [Response] and [SearchResponse] interface types.
+with respect to the [Response] and [Search] interface types.
 */
 func (_ SearchAsyncResult) Encode() ([]byte, error) { return nil, nil }
 
 /*
 Decode returns a nil error. This method serves no useful purpose and only exists
 to satify Go's interface signature requirements with respect to the [Response]
-and [SearchResponse] interface types.
+and [Search] interface types.
 */
-func (_ SearchAsyncResult) Decode(enc []byte) error            { return nil }
-func (_ SearchAsyncResult) Tag() int                           { return -1 }
-func (_ SearchAsyncResult) classTag() Tag                      { return Tag{} }
-func (_ SearchAsyncResult) Kind() string                       { return `async` } // asynchronous
-func (_ SearchAsyncResult) Choice() string                     { return `searchResults` }
-func (_ SearchAsyncResult) IsProtocolOp()                      {}
-func (_ SearchAsyncResult) IsResponseOp()                      {}
-func (_ SearchAsyncResult) Result() Enumerated                 { return -1 }
-func (r SearchAsyncResult) Error() error                       { return r.err }
-func (r SearchAsyncResult) Chan() chan *SearchResultEntry      { return r.asyncE }
-func (r SearchAsyncResult) Controls() Controls                 { return r.ctrls }
-func (r SearchAsyncResult) Entry() *SearchResultEntry          { return r.entry }
-func (r SearchAsyncResult) Reference() *SearchResultReference  { return r.referral }
-func (r SearchAsyncResult) Done() *SearchResultDone            { return r.done }
-func (r *SearchAsyncResult) SetError(err error)                { r.err = err }
-func (r *SearchAsyncResult) AddControl(ctrl Control)           { r.ctrls.Append(ctrl) }
-func (r *SearchAsyncResult) SetDone(done *SearchResultDone)    { r.done = done }
+func (_ SearchAsyncResult) Decode(enc []byte) error           { return nil }
+func (_ SearchAsyncResult) Tag() int                          { return -1 }
+func (_ SearchAsyncResult) classTag() Tag                     { return Tag{} }
+func (_ SearchAsyncResult) Kind() string                      { return `async` } // asynchronous
+func (_ SearchAsyncResult) Choice() string                    { return `searchResults` }
+func (_ SearchAsyncResult) IsProtocolOp()                     {}
+func (_ SearchAsyncResult) IsResponseOp()                     {}
+func (_ SearchAsyncResult) Result() Enumerated                { return -1 }
+func (r SearchAsyncResult) Error() error                      { return r.err }
+func (r SearchAsyncResult) Chan() chan *SearchResultEntry     { return r.asyncE }
+func (r SearchAsyncResult) Controls() Controls                { return r.ctrls }
+func (r SearchAsyncResult) Entry() *SearchResultEntry         { return r.entry }
+func (r SearchAsyncResult) Reference() *SearchResultReference { return r.referral }
+func (r SearchAsyncResult) Done() *SearchResultDone           { return r.done }
+func (r *SearchAsyncResult) SetError(err error)               { r.err = err }
+func (r *SearchAsyncResult) AddControl(ctrl Control)          { r.ctrls.Append(ctrl) }
+func (r *SearchAsyncResult) SetDone(done *SearchResultDone)   { r.done = done }
 
 func (r *SearchAsyncResult) Next() bool {
 	var is bool
@@ -163,8 +170,9 @@ func NewSearchAsyncResult(size ...int) SearchAsyncResult {
 }
 
 /*
-SearchSyncResult is a [Response] implementation type intended for
-use as a return value following an synchronous search request.
+SearchSyncResult is a [Search] and [Response] implementation type intended for use
+as a return value following an synchronous search request. It stores slices of
+*[SearchResultEntry], response [Control] instances and a *[SearchResultReference].
 */
 type SearchSyncResult struct {
 	Entries  []*SearchResultEntry
@@ -175,33 +183,33 @@ type SearchSyncResult struct {
 /*
 Encode returns a nil []byte instance alongside an error. This method serves no
 useful purpose and only exists to satify Go's interface signature requirements
-with respect to the [Response] and [SearchResponse] interface types.
+with respect to the [Response] and [Search] interface types.
 */
 func (_ SearchSyncResult) Encode() ([]byte, error) { return nil, nil }
 
 /*
 Decode returns a nil error. This method serves no useful purpose and only exists
 to satify Go's interface signature requirements with respect to the [Response]
-and [SearchResponse] interface types.
+and [Search] interface types.
 */
-func (_ SearchSyncResult) Decode(enc []byte) error                        { return nil }
-func (_ SearchSyncResult) Tag() int                                       { return -1 }
-func (_ SearchSyncResult) classTag() Tag                                  { return Tag{} }
-func (_ SearchSyncResult) Kind() string                                   { return `sync` } // synchronous
-func (_ SearchSyncResult) Choice() string                                 { return `searchResults` }
-func (_ SearchSyncResult) IsProtocolOp()                                  {}
-func (_ SearchSyncResult) IsResponseOp()                                  {}
-func (_ SearchSyncResult) Result() Enumerated                             { return -1 }
-func (_ SearchSyncResult) Error() error                                   { return nil }
-func (_ *SearchSyncResult) Next() bool                                    { return false }
-func (_ *SearchSyncResult) SetDone(_ *SearchResultDone)    		  {}
-func (_ *SearchSyncResult) SetError(_ error)                		  {}
-func (r *SearchSyncResult) AddControl(ctrl Control)                       { r.ctrls.Append(ctrl) }
-func (r SearchSyncResult) Entry() *SearchResultEntry         		  { return nil }
-func (r SearchSyncResult) Reference() *SearchResultReference 		  { return nil }
-func (r SearchSyncResult) Controls() Controls                             { return r.ctrls }
-func (r SearchSyncResult) Chan() chan *SearchResultEntry      		  { return nil }
-func (r SearchSyncResult) Done() *SearchResultDone           		  { return nil }
+func (_ SearchSyncResult) Decode(enc []byte) error           { return nil }
+func (_ SearchSyncResult) Tag() int                          { return -1 }
+func (_ SearchSyncResult) classTag() Tag                     { return Tag{} }
+func (_ SearchSyncResult) Kind() string                      { return `sync` } // synchronous
+func (_ SearchSyncResult) Choice() string                    { return `searchResults` }
+func (_ SearchSyncResult) IsProtocolOp()                     {}
+func (_ SearchSyncResult) IsResponseOp()                     {}
+func (_ SearchSyncResult) Result() Enumerated                { return -1 }
+func (_ SearchSyncResult) Error() error                      { return nil }
+func (_ *SearchSyncResult) Next() bool                       { return false }
+func (_ *SearchSyncResult) SetDone(_ *SearchResultDone)      {}
+func (_ *SearchSyncResult) SetError(_ error)                 {}
+func (r *SearchSyncResult) AddControl(ctrl Control)          { r.ctrls.Append(ctrl) }
+func (r SearchSyncResult) Entry() *SearchResultEntry         { return nil }
+func (r SearchSyncResult) Reference() *SearchResultReference { return nil }
+func (r SearchSyncResult) Controls() Controls                { return r.ctrls }
+func (r SearchSyncResult) Chan() chan *SearchResultEntry     { return nil }
+func (r SearchSyncResult) Done() *SearchResultDone           { return nil }
 
 func NewSearchSyncResult() SearchSyncResult {
 	return SearchSyncResult{
