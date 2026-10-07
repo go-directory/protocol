@@ -185,14 +185,6 @@ Modify implements [§ 4.6 of RFC4511], circumscribing an [LDAPResult].
 type ModifyResponse = response.Modify
 
 /*
-SearchResponse implements the [Response] interface type, and serves to unify both
-[SearchSyncResult] and [SearchAsyncResult] search result types. It does not extend
-from any standard and is merely implemented for convenience with respect to message
-handling by the DUA.
-*/
-type SearchResponse = response.Search
-
-/*
 	SearchResultDone ::= [APPLICATION 5] LDAPResult
 
 SearchResultDone implements [§ 4.5.2 of RFC4511], circumscribing
@@ -223,13 +215,10 @@ SearchResultEntry implements [§ 4.5.2 of RFC4511].
 type SearchResultEntry = response.SearchResultEntry
 
 /*
-SearchSyncResult implements [Response] and [SearchResponse] interface types, and
-is intended for use as the return value following a synchronous search call.
-*/
-type SearchSyncResult = response.SearchSyncResult
+        Referral ::= SEQUENCE SIZE (1..MAX) OF uri URI
 
-/*
-SearchAsyncResult implements [Response] and [SearchResponse] interface types, and
-is intended for use as the return value following an asynchronous search call.
+Referral implements [§ 4.1.10 of RFC4511].
+
+[§ 4.1.10 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.1.10
 */
-type SearchAsyncResult = response.SearchAsyncResult
+type Referral = response.Referral
