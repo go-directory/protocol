@@ -24,7 +24,7 @@ type.
 [§ 2.2 of RFC4512]: https://datatracker.ietf.org/doc/html/rfc4512#section-2.2
 */
 type Entry struct {
-	DN         LDAPDN
+	Name       LDAPDN
 	Attributes []EntryAttribute
 }
 
@@ -51,10 +51,12 @@ func NewEntry(dn LDAPDN, attrs map[string][]string) Entry {
 		})
 	}
 	return Entry{
-		DN:         dn,
+		Name:       dn,
 		Attributes: encodedAttributes,
 	}
 }
+
+func (r Entry) DN() LDAPDN { return r.Name }
 
 /*
 GetAttributeValues returns an instance of [][AttributeValue], which will contain all
