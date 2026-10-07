@@ -17,7 +17,7 @@ func ExampleEntry() {
 	}
 
 	entry := NewEntry(dn, attrs)
-	fmt.Printf("dn: %s\n", entry.DN)
+	fmt.Printf("dn: %s\n", entry.DN())
 	classes := entry.GetAttributeValues(AttributeDescription(`objectClass`)) // plain []byte is OK too
 	fmt.Printf("objectClass: %v\n", classes)
 	firstCN := entry.GetAttributeValue(AttributeDescription(`cn`))
