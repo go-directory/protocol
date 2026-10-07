@@ -15,8 +15,8 @@ advantageous.
 Instances of this type are NOT used in any official LDAP operation, such as
 Search, Delete and others.
 
-Though this type bears a strong resemblance to the [response.SearchResultEntry] type,
-the two are not related.
+Though this type bears a strong resemblance to the [response.SearchResultEntry]
+type, the two are not related.
 
 See the [NewEntry] constructor for a means of assembling new instances of this
 type.
@@ -57,6 +57,15 @@ func NewEntry(dn LDAPDN, attrs map[string][]string) Entry {
 }
 
 func (r Entry) DN() LDAPDN { return r.Name }
+
+/*
+Choice returns the string literal 'entry'. This method exists only to allow easier type
+management within the [util/ldif] package and does not relate to, nor extend from, any
+ASN.1 CHOICE definition, official or otherwise.
+
+[util/ldif]: https://github.com/go-directory/util/tree/main/ldif
+*/
+func (_ Entry) Choice() string { return `entry` }
 
 /*
 GetAttributeValues returns an instance of [][AttributeValue], which will contain all
@@ -109,6 +118,7 @@ func (r Entry) GetAttributeDescriptions() []AttributeDescription {
 
 /*
 GetAttributeDescriptions returns slices of [AttributeDescription].
+
 Note that these slices will not contain any [AttributeOption]
 statements, such as tags.
 
@@ -119,7 +129,7 @@ func (r Entry) GetAttributeTypes() []AttributeType {
 	var types []AttributeType
 	for i := 0; i < len(r.Attributes); i++ {
 		attr := r.Attributes[i]
-		types = append(types, attr.Type.Type())
+		types = append(types, attr.Type.Type()) // type ONLY
 	}
 
 	return types
