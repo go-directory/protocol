@@ -215,7 +215,7 @@ SearchResultEntry implements [§ 4.5.2 of RFC4511].
 type SearchResultEntry = response.SearchResultEntry
 
 /*
-        Referral ::= SEQUENCE SIZE (1..MAX) OF uri URI
+	Referral ::= SEQUENCE SIZE (1..MAX) OF uri URI
 
 Referral implements [§ 4.1.10 of RFC4511].
 
