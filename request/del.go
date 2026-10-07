@@ -19,6 +19,7 @@ func (_ Del) Tag() int       { return TagDel }
 func (_ Del) IsProtocolOp()  {}
 func (_ Del) IsRequestOp()   {}
 func (_ Del) classTag() Tag  { return aTag(classA, false, uint32(TagDel)) }
+func (r Del) DN() LDAPDN     { return LDAPDN(r) }
 
 /*
 Encode returns an instance of []byte alongside an error following

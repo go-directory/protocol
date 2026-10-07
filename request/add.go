@@ -20,6 +20,7 @@ func (_ Add) Kind() string   { return `request` }
 func (_ Add) Choice() string { return nameAddChoice }
 func (_ Add) Tag() int       { return TagAdd }
 func (_ Add) classTag() Tag  { return aTag(classA, true, uint32(TagAdd)) }
+func (r Add) DN() LDAPDN     { return r.Entry }
 
 func (r *Add) Attribute(at AttributeDescription, av ...AttributeValue) {
 	idx := r.Attributes.IndexOf(at)

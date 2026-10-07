@@ -48,6 +48,7 @@ func (_ Modify) Kind() string   { return `request` }
 func (_ Modify) Choice() string { return nameModifyChoice }
 func (_ Modify) Tag() int       { return TagModify }
 func (_ Modify) classTag() Tag  { return aTag(classA, true, uint32(TagModify)) }
+func (r Modify) DN() LDAPDN     { return r.Object }
 
 /*
 Add appends an "add changetype" directive to the receiver using the provided
