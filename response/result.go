@@ -76,6 +76,11 @@ func (_ LDAPResult) Kind() string   { return `result` }
 func (_ LDAPResult) Tag() int       { return -1 }
 func (_ LDAPResult) IsProtocolOp()  {}
 
+/*
+Deprecated: use [LDAPResult.Referral.Append].
+
+Panic warning: allocation not included.
+*/
 func (r *LDAPResult) AppendReferral(ref ...URI) {
 	if r.Referral == nil {
 		(*r.Referral) = Referral{}
@@ -219,7 +224,7 @@ func (r *LDAPResult) Decode(enc []byte) error {
 /*
 ResultCode [Enumerated] constants, per [§ 4.1.9 of RFC4511].
 
-Note that the following codes and code ranges are RESERVED:
+Note that the following codes and code ranges are formally RESERVED:
 
   - 9
   - 15
