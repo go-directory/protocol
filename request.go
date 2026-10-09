@@ -262,3 +262,15 @@ Note that there is no response counterpart definition for this type.
 [§ 4.11 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.11
 */
 type AbandonRequest = request.Abandon
+
+/*
+OIDs for various [Request] or [Response] notices.
+*/
+var (
+	OIDNoticeOfDisconnection   = request.NoticeOfDisconnection   // 1.3.6.1.4.1.1466.2003
+	OIDNoticeOfCancel          = request.NoticeOfCancel          // 1.3.6.1.1.8
+	OIDNoticeOfStartTLS        = request.NoticeOfStartTLS        // 1.3.6.1.4.1.1466.20037
+	OIDNoticeOfWhoAmI          = request.NoticeOfWhoAmI          // 1.3.6.1.4.1.4203.1.11.3
+	OIDNoticeOfGetConnectionID = request.NoticeOfGetConnectionID // 1.3.6.1.4.1.26027.1.6.2
+	OIDNoticeOfPasswordModify  = request.NoticeOfPasswordModify  // 1.3.6.1.4.1.4203.1.11.1
+)
