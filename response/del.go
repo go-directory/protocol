@@ -17,6 +17,8 @@ func (_ Del) IsResponseOp()      {}
 func (_ Del) classTag() Tag      { return aTag(classA, true, uint32(TagDel)) }
 func (r Del) Result() Enumerated { return LDAPResult(r).ResultCode }
 
+func NewDel(rc Enumerated) Del { return Del{ResultCode: rc} }
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an

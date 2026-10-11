@@ -24,6 +24,19 @@ func (_ Intermediate) classTag() Tag {
 }
 func (r Intermediate) Result() Enumerated { return 0 }
 
+func NewIntermediate() Intermediate { return Intermediate{} }
+
+func (r *Intermediate) SetName(resp LDAPOID)      { r.ResponseName = &resp }
+func (r *Intermediate) SetValue(resp OctetString) { r.ResponseValue = &resp }
+
+func (r Intermediate) HasName() bool {
+	return r.ResponseName != nil && len((*r.ResponseName)) > 0
+}
+
+func (r Intermediate) HasValue() bool {
+	return r.ResponseValue != nil && len((*r.ResponseValue)) > 0
+}
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as

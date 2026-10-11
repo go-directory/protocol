@@ -74,6 +74,23 @@ func (_ SearchResultEntry) classTag() Tag {
 }
 func (r SearchResultEntry) Result() Enumerated { return 0 }
 
+func NewSearchResultEntry(dn LDAPDN, attrs ...PartialAttribute) SearchResultEntry {
+	var parts PartialAttributeList
+	for i := 0; i < len(attrs); i++ {
+		parts = append(parts, attrs[i])
+	}
+
+	return SearchResultEntry{
+		ObjectName: dn,
+		Attributes: parts,
+	}
+}
+
+func (r *SearchResultEntry) SetObjectName(dn LDAPDN) { r.ObjectName = dn }
+func (r *SearchResultEntry) AppendPartialAttribute(part PartialAttribute) {
+	r.Attributes = append(r.Attributes, part)
+}
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an
@@ -197,6 +214,8 @@ func (_ SearchResultDone) IsResponseOp()      {}
 func (_ SearchResultDone) Tag() int           { return TagSearchResultDone }
 func (_ SearchResultDone) classTag() Tag      { return aTag(classA, true, uint32(TagSearchResultDone)) }
 func (r SearchResultDone) Result() Enumerated { return LDAPResult(r).ResultCode }
+
+func NewSearchResultDone(rc Enumerated) SearchResultDone { return SearchResultDone{ResultCode: rc} }
 
 /*
 Encode returns an instance of []byte alongside an error following

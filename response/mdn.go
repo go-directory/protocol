@@ -17,6 +17,8 @@ func (_ ModifyDN) IsResponseOp()      {}
 func (_ ModifyDN) classTag() Tag      { return aTag(classA, true, uint32(TagModifyDN)) }
 func (r ModifyDN) Result() Enumerated { return LDAPResult(r).ResultCode }
 
+func NewModifyDN(rc Enumerated) ModifyDN { return ModifyDN{ResultCode: rc} }
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an

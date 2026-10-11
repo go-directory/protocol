@@ -17,6 +17,8 @@ func (_ Compare) IsResponseOp()      {}
 func (_ Compare) classTag() Tag      { return aTag(classA, true, uint32(TagCompare)) }
 func (r Compare) Result() Enumerated { return LDAPResult(r).ResultCode }
 
+func NewCompare(rc Enumerated) Compare { return Compare{ResultCode: rc} }
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an

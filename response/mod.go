@@ -17,6 +17,8 @@ func (_ Modify) Tag() int           { return TagModify }
 func (_ Modify) classTag() Tag      { return aTag(classA, true, uint32(TagModify)) }
 func (r Modify) Result() Enumerated { return LDAPResult(r).ResultCode }
 
+func NewModify(rc Enumerated) Modify { return Modify{ResultCode: rc} }
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an

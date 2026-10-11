@@ -22,6 +22,19 @@ func (_ Bind) Choice() string     { return nameBindChoice }
 func (_ Bind) classTag() Tag      { return aTag(classA, true, uint32(TagBind)) }
 func (r Bind) Result() Enumerated { return r.LDAPResult.ResultCode }
 
+func NewBind(rc Enumerated, creds ...OctetString) Bind {
+	var bind Bind
+	bind.LDAPResult.ResultCode = rc
+
+	if len(creds) > 0 && len(creds[0]) > 0 {
+		bind.SetSaslCreds(creds[0])
+	}
+
+	return bind
+}
+
+func (r *Bind) SetSaslCreds(creds OctetString) { r.ServerSaslCreds = &creds }
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance within

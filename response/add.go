@@ -17,6 +17,8 @@ func (_ Add) Tag() int           { return TagAdd }
 func (_ Add) classTag() Tag      { return aTag(classA, true, uint32(TagAdd)) }
 func (r Add) Result() Enumerated { return LDAPResult(r).ResultCode }
 
+func NewAdd(rc Enumerated) Add { return Add{ResultCode: rc} }
+
 func (r Add) Encode() ([]byte, error) {
 	var enc []byte
 	res, err := LDAPResult(r).Encode() // LDAPResult SEQUENCE
