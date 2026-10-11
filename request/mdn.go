@@ -100,6 +100,20 @@ func (_ ModifyDN) classTag() Tag  { return aTag(classA, true, uint32(TagModifyDN
 func (r ModifyDN) DN() LDAPDN     { return r.Entry }
 
 /*
+HasNewSuperior returns a Boolean value indicative of a non-nil, non-zero
+*[OctetString] value being present within the "RequestValue" component.
+*/
+func (r ModifyDN) HasNewSuperior() bool {
+	return r.NewSuperior != nil && len((*r.NewSuperior)) > 0
+}
+
+/*
+SetNewSuperior assigns the [LDAPDN] via pointer reference to the
+"NewSuperior" component.
+*/
+func (r *ModifyDN) SetNewSupeior(dn LDAPDN) { r.NewSuperior = &dn }
+
+/*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an
 [APPLICATION 12] SEQUENCE.

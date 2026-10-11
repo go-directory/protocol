@@ -50,6 +50,27 @@ func (_ Modify) Tag() int       { return TagModify }
 func (_ Modify) classTag() Tag  { return aTag(classA, true, uint32(TagModify)) }
 func (r Modify) DN() LDAPDN     { return r.Object }
 
+func NewModify(object LDAPDN, changes ...ModifyChange) Modify {
+	var mod Modify
+	mod.Object = object
+
+	if L := len(changes); L > 0 {
+		mod.Changes = make([]ModifyChange, 0)
+		for i := 0; i < L; i++ {
+			mod.Changes = append(mod.Changes, changes[i])
+		}
+	}
+
+	return mod
+}
+
+func NewModifyChange(op Enumerated, mod PartialAttribute) ModifyChange {
+	return ModifyChange{
+		Operation:    op,
+		Modification: mod,
+	}
+}
+
 /*
 Add appends an "add changetype" directive to the receiver using the provided
 [AttributeDescription] and [AttributeValue] instances.

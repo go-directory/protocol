@@ -21,6 +21,23 @@ func (_ Extended) IsProtocolOp()  {}
 func (_ Extended) IsRequestOp()   {}
 func (_ Extended) classTag() Tag  { return aTag(classA, true, uint32(TagExtended)) }
 
+func NewExtended(name LDAPOID, value ...OctetString) Extended {
+	var ext Extended
+	ext.SetName(name)
+	if len(value) > 0 && len(value[0]) > 0 {
+		ext.SetValue(value[0])
+	}
+
+	return ext
+}
+
+func (r *Extended) SetName(name LDAPOID)       { r.RequestName = name }
+func (r *Extended) SetValue(value OctetString) { r.RequestValue = &value }
+
+func (r Extended) HasValue() bool {
+	return r.RequestValue != nil && len((*r.RequestValue)) > 0
+}
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an

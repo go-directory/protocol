@@ -21,6 +21,11 @@ func (_ Compare) IsProtocolOp()  {}
 func (_ Compare) IsRequestOp()   {}
 func (_ Compare) classTag() Tag  { return aTag(classA, true, uint32(TagCompare)) }
 
+func NewCompare() Compare { return Compare{} }
+
+func (r *Compare) SetEntry(dn LDAPDN)                 { r.Entry = dn }
+func (r *Compare) SetAVA(ava AttributeValueAssertion) { r.AVA = ava }
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as

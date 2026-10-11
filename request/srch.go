@@ -74,6 +74,74 @@ func (_ Search) Choice() string { return nameSearchChoice }
 func (_ Search) Tag() int       { return TagSearch }
 func (_ Search) classTag() Tag  { return aTag(classA, true, uint32(TagSearch)) }
 
+func NewSearch(
+	base LDAPDN,
+	scope, deref, sizelimit, timelimit int,
+	typesOnly bool,
+	filter []byte,
+	attrs ...LDAPString,
+) Search {
+
+	var srch Search
+
+	srch.SetBaseObject(base)
+	srch.SetScope(Enumerated(scope))
+	srch.SetDeref(Enumerated(deref))
+	srch.SetTypesOnly(Boolean(typesOnly))
+	srch.SetSizeLimit(sizelimit)
+	srch.SetTimeLimit(timelimit)
+	srch.SetFilter(filter)
+	srch.AppendAttribute(attrs...)
+
+	return srch
+}
+
+func (r *Search) SetBaseObject(base LDAPDN) { r.BaseObject = base }
+
+func (r *Search) SetScope(scope Enumerated) {
+	if ScopeBaseObject <= scope && scope <= ScopeWholeSubtree {
+		r.Scope = scope
+	}
+}
+
+func (r *Search) SetDeref(deref Enumerated) {
+	if DerefAliasesNever <= deref && deref <= DerefAlways {
+		r.DerefAliases = deref
+	}
+}
+
+func (r *Search) SetTypesOnly(t Boolean) { r.TypesOnly = t }
+
+func (r *Search) SetSizeLimit(limit int) {
+	size, _ := NewInteger(limit)
+	if size.Ge(0) && size.Le(UBSizeLimit) {
+		r.SizeLimit = size
+	}
+}
+
+func (r *Search) SetTimeLimit(limit int) {
+	thyme, _ := NewInteger(limit)
+	if thyme.Ge(0) && thyme.Le(UBTimeLimit) {
+		r.TimeLimit = thyme
+	}
+}
+
+func (r *Search) SetFilter(filter []byte) {
+	if filt, err := NewFilter(filter); err == nil {
+		r.Filter = filt
+	}
+}
+
+func (r *Search) AppendAttribute(at ...LDAPString) {
+	if r.Attributes == nil {
+		r.Attributes = make(AttributeSelection, 0)
+	}
+
+	for i := 0; i < len(at); i++ {
+		r.Attributes = append(r.Attributes, at[i])
+	}
+}
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as

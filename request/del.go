@@ -21,6 +21,8 @@ func (_ Del) IsRequestOp()   {}
 func (_ Del) classTag() Tag  { return aTag(classA, false, uint32(TagDel)) }
 func (r Del) DN() LDAPDN     { return LDAPDN(r) }
 
+func NewDel(dn LDAPDN) Del { return Del(dn) }
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an

@@ -22,6 +22,19 @@ func (_ Add) Tag() int       { return TagAdd }
 func (_ Add) classTag() Tag  { return aTag(classA, true, uint32(TagAdd)) }
 func (r Add) DN() LDAPDN     { return r.Entry }
 
+func NewAdd(dn LDAPDN, attr ...Attribute) Add {
+	add := Add{
+		Entry:      dn,
+		Attributes: make(AttributeList, 0),
+	}
+
+	for i := 0; i < len(attr); i++ {
+		add.Attributes = append(add.Attributes, attr[i])
+	}
+
+	return add
+}
+
 func (r *Add) Attribute(at AttributeDescription, av ...AttributeValue) {
 	idx := r.Attributes.IndexOf(at)
 	if idx == -1 {

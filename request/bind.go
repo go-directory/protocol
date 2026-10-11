@@ -32,6 +32,8 @@ type Bind struct {
 	Authentication AuthenticationChoice
 }
 
+func NewBind() Bind { return Bind{} }
+
 /*
 SetVersion sets the version of the receiver instance. This method is merely
 a convenient alternative to manual invocation of [syntax.NewInteger].
@@ -43,25 +45,61 @@ func (r *Bind) SetVersion(v int) {
 	}
 }
 
+func (r *Bind) SetName(name LDAPDN) { r.Name = name }
+func (r *Bind) SetAuthChoice(choice AuthenticationChoice) {
+	r.Authentication = choice
+}
+
 /*
 SimpleBind returns an instance of [Bind] in the context of a "simple"
-[AuthenticationChoice]. Successful use of this method will return the
-following structure:
+[AuthenticationChoice] implementation type instane. Successful use of
+this method will return the following structure:
 
 	Bind{
 	      Version: 3,
 	      Name: LDAPDN(<the bind dn>),                      // LDAPDN (OCTET STRING)
 	      Authentication: SimpleCredentials(<the bind pw>), // Authentication CHOICE [0], OCTET STRING
 	}
+
+Use of this constructor is intended merely as a convenient alternative
+to manual assembly of an appropriate [Bind] instance.
 */
 func SimpleBind(bdn LDAPDN, bpw SimpleCredentials) Bind {
-	req := Bind{
-		Name:           bdn,
-		Authentication: bpw,
-	}
-	req.SetVersion(3)
+	var bind Bind
 
-	return req
+	bind.SetName(bdn)
+	bind.SetAuthChoice(bpw)
+	bind.SetVersion(3)
+
+	return bind
+}
+
+/*
+ExternalBind returns an instance of [Bind] in the context of a
+"SASL/EXTERNAL" [AuthenticationChoice] implementation type instance.
+Successful use of this method will return the following structure:
+
+	Bind{
+	      Version: 3,
+	      Name: LDAPDN(<the bind dn>),
+	      Authentication: SaslCredentials{
+	            Mechanism: LDAPString("EXTERNAL"),
+	      },
+	}
+
+Use of this constructor is intended merely as a convenient alternative
+to manual assembly of an appropriate [Bind] instance.
+*/
+func ExternalBind(bdn LDAPDN) Bind {
+	var bind Bind
+
+	bind.SetName(bdn)
+	bind.SetAuthChoice(SaslCredentials{
+		Mechanism: LDAPString(`EXTERNAL`),
+	})
+	bind.SetVersion(3)
+
+	return bind
 }
 
 func (_ Bind) IsProtocolOp()  {}
