@@ -3,8 +3,8 @@ module github.com/go-directory/protocol
 go 1.26.7
 
 require (
-	github.com/go-directory/common v0.0.0-20261011064511-8106c22684eb
-	github.com/go-directory/encoding v0.0.0-20261011071436-d49e92f5b4a9
+	github.com/go-directory/common v0.0.0-20261011084555-4a29ce28b730
+	github.com/go-directory/encoding v0.0.0-20261011084728-f1233ee48fc3
 	github.com/go-directory/syntax v0.0.0-20261011071904-67e6cdc90e04
 )
 
