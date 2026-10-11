@@ -18,6 +18,8 @@ func (_ Abandon) IsProtocolOp()  {}
 func (_ Abandon) IsRequestOp()   {}
 func (_ Abandon) classTag() Tag  { return aTag(classA, false, uint32(TagAbandon)) }
 
+func NewAbandon(id MessageID) Abandon { return Abandon(id) }
+
 /*
 Encode returns an instance of []byte alongside an error following
 an attempt to encode the contents of the receiver instance as an

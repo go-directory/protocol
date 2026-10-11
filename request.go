@@ -78,7 +78,7 @@ It is used by the DUA to request StartTLS be used for the session.
 [§ 4.14.1 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.14.1
 */
 var StartTLSRequest = ExtendedRequest{
-	RequestName: request.NoticeOfStartTLS,
+	RequestName: OIDNoticeOfStartTLS,
 }
 
 /*
@@ -98,7 +98,11 @@ ModifyRequest implements [§ 4.6 of RFC4511].
 */
 type ModifyRequest = request.Modify
 
+var NewModifyRequest = request.NewModify
+
 type ModifyRequestChange = request.ModifyChange
+
+var NewModifyChange = request.NewModifyChange
 
 /*
 	ModifyDNRequest ::= [APPLICATION 12] SEQUENCE {
@@ -115,6 +119,15 @@ using the [RenameEntry], [MoveEntry] and [RenameAndMoveEntry] functions.
 type ModifyDNRequest = request.ModifyDN
 
 /*
+ModifyDN constructor alias.
+*/
+var (
+	MoveEntry          = request.MoveEntry
+	RenameEntry        = request.RenameEntry
+	RenameAndMoveEntry = request.RenameAndMoveEntry
+)
+
+/*
 	CompareRequest ::= [APPLICATION 14] SEQUENCE {
 	     entry           LDAPDN,
 	     ava             AttributeValueAssertion }
@@ -124,6 +137,8 @@ CompareRequest implements [§ 4.10 of RFC4511].
 [§ 4.10 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.10
 */
 type CompareRequest = request.Compare
+
+var NewCompareRequest = request.NewCompare
 
 /*
 	Extended ::= [APPLICATION 23] SEQUENCE {
@@ -136,6 +151,8 @@ Extended implements [§ 4.12 of RFC4511].
 */
 type ExtendedRequest = request.Extended
 
+var NewExtendedRequest = request.NewExtended
+
 /*
 	AddRequest ::= [APPLICATION 8] SEQUENCE {
 	     entry           LDAPDN,
@@ -146,6 +163,8 @@ AddRequest implements [§ 4.7 of RFC4511].
 [§ 4.7 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.7
 */
 type AddRequest = request.Add
+
+var NewAddRequest = request.NewAdd
 
 /*
 	BindRequest ::= [APPLICATION 0] SEQUENCE {
@@ -159,6 +178,8 @@ BindRequest implements [§ 4.2 of RFC4511].
 */
 type BindRequest = request.Bind
 
+var NewBindRequest = request.NewBind
+
 /*
 SimpleBind returns an instance of [BindRequest] in the context of a
 "simple" [request.AuthenticationChoice]. Successful use of this method
@@ -170,7 +191,14 @@ will return the following structure:
 		Authentication: SimpleCredentials(<the bind pw>), // Authentication CHOICE [0], OCTET STRING
 	  }
 */
-var SimpleBind = request.SimpleBind
+
+/*
+[Bind] constructor alias.
+*/
+var (
+	SimpleBind   = request.SimpleBind
+	ExternalBind = request.ExternalBind
+)
 
 /*
 	UnbindRequest ::= [APPLICATION 2] NULL
@@ -183,6 +211,8 @@ Note that there is no response counterpart definition for this type.
 */
 type UnbindRequest = request.Unbind
 
+var NewUnbindRequest = request.NewUnbind
+
 /*
 	DelRequest ::= [APPLICATION 10] LDAPDN
 
@@ -191,6 +221,8 @@ DelRequest implements [§ 4.8 of RFC4511].
 [§ 4.8 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.8
 */
 type DelRequest = request.Del
+
+var NewDelRequest = request.NewDel
 
 /*
 	scope ::= ENUMERATED {
@@ -252,6 +284,8 @@ SearchRequest implements [§ 4.5.1 of RFC4511].
 */
 type SearchRequest = request.Search
 
+var NewSearchRequest = request.NewSearch
+
 /*
 	AbandonRequest ::= [APPLICATION 16] MessageID
 
@@ -262,6 +296,8 @@ Note that there is no response counterpart definition for this type.
 [§ 4.11 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.11
 */
 type AbandonRequest = request.Abandon
+
+var NewAbandonRequest = request.NewAbandon
 
 /*
 OIDs for various [Request] or [Response] notices.

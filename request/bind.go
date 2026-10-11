@@ -348,6 +348,8 @@ Note that there is no response counterpart definition for this type.
 */
 type Unbind Null
 
+func NewUnbind() Unbind { return Unbind{} }
+
 func (_ Unbind) IsProtocolOp()  {}
 func (_ Unbind) IsRequestOp()   {}
 func (_ Unbind) Kind() string   { return `request` }
