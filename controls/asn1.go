@@ -30,6 +30,34 @@ type (
 	Tag      = asn1.Tag
 )
 
+/*
+	subentriesControl ::= SEQUENCE {
+	        controlType     1.3.6.1.4.1.4203.1.10.1,
+	        controlValue    subentriesBERBooleanValue }
+
+Subentries implements [§ 3 of RFC3672] and is identified by the
+controlType [OIDSubentries].
+
+Note that because the controlType is fixed per the specification,
+the "ControlType" field is omitted from this implementation. When
+encoded, however, it must be present.
+
+The criticality field is absent and should not be present.
+
+The controlValue field will contain a BER encoded value of 01 01 00
+(for false), or 01 01 FF (for true).
+
+Per the section in question:
+
+	A controlValue containing the value TRUE indicates that subentries
+	are visible and normal entries are not.  A controlValue containing
+	the value FALSE indicates that normal entries are visible and
+	subentries are not.
+
+[§ 3 of RFC3672]: https://datatracker.ietf.org/doc/html/rfc3672#section-3
+*/
+type Subentries syntax.Boolean
+
 var (
 	readTag   = asn1.ReadTag
 	wrapTLV   = asn1.WrapTLV
