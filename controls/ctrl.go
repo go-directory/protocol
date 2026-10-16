@@ -23,6 +23,22 @@ implementation type instances.
 */
 type Controls []Control
 
+func (r Controls) Get(typ LDAPOID) (Control, bool) {
+	var (
+		ctrl  Control
+		found bool
+	)
+
+	for i := 0; i < len(r); i++ {
+		if found = r[i].Type().Equal(typ); found {
+			ctrl = r[i]
+			break
+		}
+	}
+
+	return ctrl, found
+}
+
 /*
 Append appends the input variadic [Control] argument(s) to the receiver instance.
 
