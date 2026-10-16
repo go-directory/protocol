@@ -44,7 +44,7 @@ func (r Null) cast() syntax.Null { return syntax.Null(r) }
 /*
 defaultFilter represents the official default [Filter], "(objectClass=*)".
 */
-var defaultFilter = syntax.DefaultFilter
+var defaultFilter = syntax.FilterDefault
 
 /*
 filterDecode is a top-level [Filter] decompiler.
