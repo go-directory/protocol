@@ -113,6 +113,7 @@ Add implements [§ 4.7 of RFC4511].
 [§ 4.7 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.7
 */
 type AddResponse = response.Add
+var NewAddResponse = response.NewAdd
 
 /*
 	BindResponse ::= [APPLICATION 1] SEQUENCE {
@@ -124,6 +125,7 @@ Bind implements [§ 4.2.2 of RFC4511].
 [§ 4.2.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.2.2
 */
 type BindResponse = response.Bind
+var NewBindResponse = response.NewBind
 
 /*
 	CompareResponse ::= [APPLICATION 15] LDAPResult
@@ -133,6 +135,7 @@ Compare implements [§ 4.10 of RFC4511].
 [§ 4.10 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.10
 */
 type CompareResponse = response.Compare
+var NewCompareResponse = response.NewCompare
 
 /*
 	ExtendedResponse ::= [APPLICATION 24] SEQUENCE {
@@ -145,6 +148,7 @@ Extended implements [§ 4.12 of RFC4511].
 [§ 4.12 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.12
 */
 type ExtendedResponse = response.Extended
+var NewExtendedResponse = response.NewExtended
 
 /*
 	DelResponse ::= [APPLICATION 11] LDAPResult
@@ -154,6 +158,7 @@ Del implements [§ 4.8 of RFC4511], circumscribing an [LDAPResult].
 [§ 4.8 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.8
 */
 type DelResponse = response.Del
+var NewDelResponse = response.NewDel
 
 /*
 	IntermediateResponse ::= [APPLICATION 25] SEQUENCE {
@@ -165,6 +170,7 @@ Intermediate implements [§ 4.13 of RFC4511].
 [§ 4.13 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.13
 */
 type IntermediateResponse = response.Intermediate
+var NewIntermediateResponse = response.NewIntermediate
 
 /*
 	ModifyDNResponse ::= [APPLICATION 13] LDAPResult
@@ -174,6 +180,7 @@ ModifyDN implements [§ 4.9 of RFC4511], circumscribing an [LDAPResult].
 [§ 4.9 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.9
 */
 type ModifyDNResponse = response.ModifyDN
+var NewModifyDNResponse = response.NewModifyDN
 
 /*
 	ModifyResponse ::= [APPLICATION 7] LDAPResult
@@ -183,6 +190,7 @@ Modify implements [§ 4.6 of RFC4511], circumscribing an [LDAPResult].
 [§ 4.6 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.6
 */
 type ModifyResponse = response.Modify
+var NewModifyResponse = response.NewModify
 
 /*
 	SearchResultDone ::= [APPLICATION 5] LDAPResult
@@ -193,6 +201,7 @@ an [LDAPResult] SEQUENCE.
 [§ 4.5.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.2
 */
 type SearchResultDone = response.SearchResultDone
+var NewSearchResultDone = response.NewSearchResultDone
 
 /*
 	SearchResultReference ::= [APPLICATION 19] SEQUENCE SIZE (1..MAX) OF uri URI
@@ -202,6 +211,7 @@ SearchResultReference implements [§ 4.5.2 of RFC4511].
 [§ 4.5.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.2
 */
 type SearchResultReference = response.SearchResultReference
+var NewSearchResultReference = response.NewSearchResultReference
 
 /*
 	SearchResultEntry ::= [APPLICATION 4] SEQUENCE {
@@ -213,6 +223,7 @@ SearchResultEntry implements [§ 4.5.2 of RFC4511].
 [§ 4.5.2 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.5.2
 */
 type SearchResultEntry = response.SearchResultEntry
+var NewSearchResultEntry = response.NewSearchResultEntry
 
 /*
 	Referral ::= SEQUENCE SIZE (1..MAX) OF uri URI
