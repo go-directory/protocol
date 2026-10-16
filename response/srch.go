@@ -157,7 +157,11 @@ func (_ SearchResultReference) classTag() Tag {
 	return aTag(classA, true, uint32(TagSearchResultReference))
 }
 func (r *SearchResultReference) Append(u URI)      { *r = append(*r, u) }
-func (r SearchResultReference) Result() Enumerated { return 0 }
+func (r SearchResultReference) Result() Enumerated { return 10 }
+
+func NewSearchResultReference() SearchResultReference {
+	return make(SearchResultReference, 0)
+}
 
 /*
 Encode returns an instance of []byte alongside an error following
