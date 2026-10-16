@@ -64,5 +64,7 @@ github.com/go-directory/syntax v0.0.0-20261015063208-e3542debb539 h1:edl29o4SQ1e
 github.com/go-directory/syntax v0.0.0-20261015063208-e3542debb539/go.mod h1:bX/+06q9KWmVZf8/y/ni3uezl0oMNH3Sj4KdNZGCpkE=
 github.com/go-directory/syntax v0.0.0-20261016134818-b095a4707a30 h1:I4bzAsvlUG80jFcM77s/J8NWcQc43yaUOI+SwapK7sk=
 github.com/go-directory/syntax v0.0.0-20261016134818-b095a4707a30/go.mod h1:bX/+06q9KWmVZf8/y/ni3uezl0oMNH3Sj4KdNZGCpkE=
+github.com/go-directory/syntax v0.0.0-20261016135024-be45548377f7 h1:w5yGnYfgxFJSSxS4XcChXVE2MI5eGRqRvpbC7Ma6JQk=
+github.com/go-directory/syntax v0.0.0-20261016135024-be45548377f7/go.mod h1:bX/+06q9KWmVZf8/y/ni3uezl0oMNH3Sj4KdNZGCpkE=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
