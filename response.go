@@ -73,6 +73,12 @@ LDAPResult implements [§ 4.1.9 of RFC4511]. See also the LDAP result code const
 */
 type LDAPResult = response.LDAPResult
 
+/*
+NewResult returns an instance of [LDAPResult] bearing the specified result code
+[Enumerated].
+*/
+var NewResult = response.NewResult
+
 var (
 	responseDecode      = response.Decode
 	responseDecodeByTag = response.DecodeByTag
