@@ -76,6 +76,10 @@ func (_ LDAPResult) Kind() string   { return `result` }
 func (_ LDAPResult) Tag() int       { return -1 }
 func (_ LDAPResult) IsProtocolOp()  {}
 
+func NewResult(rc Enumerated) LDAPResult {
+	return LDAPResult{ResultCode: rc}
+}
+
 /*
 Deprecated: use [LDAPResult.Referral.Append].
 
