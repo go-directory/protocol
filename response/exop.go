@@ -51,7 +51,7 @@ func (r Extended) Encode() ([]byte, error) {
 		res, err = unwrapTLV(res, uSeqTag())
 		if err == nil {
 			enc = append(enc, res...)
-			if len((*r.ResponseName)) > 0 {
+			if r.ResponseName != nil && len((*r.ResponseName)) > 0 {
 				//res, err = r.ResponseName.Encode()
 				if err == nil {
 					res, err = wrapTLV((*r.ResponseName),
@@ -63,7 +63,7 @@ func (r Extended) Encode() ([]byte, error) {
 				}
 			}
 
-			if len((*r.ResponseValue)) > 0 && err == nil {
+			if r.ResponseValue != nil && len((*r.ResponseValue)) > 0 && err == nil {
 				//res, err = r.ResponseValue.Encode()
 				//if err == nil {
 				res, err = wrapTLV((*r.ResponseValue),

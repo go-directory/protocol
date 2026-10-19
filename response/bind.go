@@ -51,7 +51,7 @@ func (r Bind) Encode() ([]byte, error) {
 		res, err = unwrapTLV(res, uSeqTag())
 		if err == nil {
 			enc = append(enc, res...)
-			if len((*r.ServerSaslCreds)) > 0 {
+			if r.ServerSaslCreds != nil && len((*r.ServerSaslCreds)) > 0 {
 				res, err = r.ServerSaslCreds.Encode()
 				if err == nil {
 					res, err = wrapTLV(res,

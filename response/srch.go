@@ -106,7 +106,6 @@ func (r SearchResultEntry) Encode() ([]byte, error) {
 		if err == nil {
 			enc = append(enc, attrs...)
 			enc, err = wrapTLV(enc,
-				uSeqTag(),    // SEQUENCE
 				r.classTag()) // [APPLICATION 4]
 		}
 	}
@@ -121,8 +120,7 @@ not be truncated, and must bear the [APPLICATION 4] SEQUENCE tag.
 */
 func (r *SearchResultEntry) Decode(enc []byte) error {
 	payload, err := unwrapTLV(enc,
-		r.classTag(), // [APPLICATION 4]
-		uSeqTag())    // SEQUENCE
+		r.classTag()) // [APPLICATION 4]
 
 	if err == nil {
 		p := 0
@@ -229,7 +227,10 @@ an attempt to encode the contents of the receiver instance as an
 func (r SearchResultDone) Encode() ([]byte, error) {
 	enc, err := LDAPResult(r).Encode() // SEQUENCE
 	if err == nil {
-		enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 5]
+		enc, err = unwrapTLV(enc, uSeqTag()) // SEQUENCE
+		if err == nil {
+			enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 5]
+		}
 	}
 
 	return enc, err
@@ -244,7 +245,8 @@ func (r *SearchResultDone) Decode(enc []byte) error {
 	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 5]
 	if err == nil {
 		var dec LDAPResult
-		if err = dec.Decode(payload); err == nil { // SEQUENCE
+		payload, err = wrapTLV(payload, uSeqTag()) // SEQUENCE
+		if err = dec.Decode(payload); err == nil {
 			*r = SearchResultDone(dec)
 		}
 	}

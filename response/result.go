@@ -107,22 +107,18 @@ func (r LDAPResult) Encode() ([]byte, error) {
 			diag, err = OctetString(r.DiagnosticMessage).Encode()
 			if err == nil {
 				payload = append(payload, diag...)
-				if len((*r.Referral)) > 0 {
-					var refs []byte
+				var refs []byte
+				if r.Referral != nil && len((*r.Referral)) > 0 {
 					refs, err = r.Referral.Encode() // SEQUENCE OF
 					if err == nil {
 						// Wrap as a CONTEXT-SPECIFIC [3]
 						refs, err = wrapTLV(refs,
-							aTag(classC,
-								true, uint32(3)))
-
-						if err == nil {
-							payload = append(payload, refs...)
-						}
+							aTag(classC, true, uint32(3)))
 					}
 				}
 
 				if err == nil {
+					payload = append(payload, refs...)
 					// Wrap entire payload as SEQUENCE
 					out, err = wrapTLV(payload, uSeqTag())
 				}

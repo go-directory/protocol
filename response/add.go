@@ -20,23 +20,29 @@ func (r Add) Result() Enumerated { return LDAPResult(r).ResultCode }
 func NewAdd(rc Enumerated) Add { return Add{ResultCode: rc} }
 
 func (r Add) Encode() ([]byte, error) {
-	var enc []byte
-	res, err := LDAPResult(r).Encode() // LDAPResult SEQUENCE
+	enc, err := LDAPResult(r).Encode() // LDAPResult SEQUENCE
+	enc, _  = unwrapTLV(enc, uSeqTag())
 	if err == nil {
-		enc, err = wrapTLV(res, r.classTag()) // [APPLICATION 9]
+		enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 9]
 	}
 
 	return enc, err
 }
 
+/*
+Decode returns an error following an attempt to decode and write
+the input encoding to the receiver instance. The encoding must
+not be truncated, and must bear the [APPLICATION 5] SEQUENCE tag.
+*/
 func (r *Add) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 9]
-	if err == nil {
-		var dec LDAPResult
-		if err = dec.Decode(payload); err == nil { // LDAPResult SEQUENCE
-			*r = Add(dec)
-		}
-	}
+        payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 9]
+        if err == nil {
+                payload, err = wrapTLV(payload, uSeqTag()) // SEQUENCE
+                var dec LDAPResult
+                if err = dec.Decode(payload); err == nil {
+                        *r = Add(dec)
+                }
+        }
 
-	return err
+        return err
 }
