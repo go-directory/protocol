@@ -89,7 +89,7 @@ func (r LDAPMessage) Encode() ([]byte, error) {
 	pop, err := r.ProtocolOp.Encode() // ProtocolOp==Response|Request
 	if err == nil {
 		enc = append(enc, pop...)
-		if len((*r.Controls)) > 0 {
+		if r.Controls != nil && len((*r.Controls)) > 0 {
 			var ctrl []byte
 			if ctrl, err = r.Controls.Encode(); err == nil { // SEQUENCE OF control Control
 				var wrap []byte
@@ -133,7 +133,7 @@ func (r *LDAPMessage) Decode(enc []byte) error {
 						var dec Controls
 						if err = dec.Decode(unwrap); err == nil { // SEQUENCE OF control Control
 							r.Controls = &dec
-						}
+						} 
 					}
 				}
 			}
