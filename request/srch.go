@@ -132,6 +132,23 @@ func (r *Search) SetFilter(filter []byte) {
 	}
 }
 
+func (r *Search) SetAllUserAttributes() {
+	r.Attributes = AttributeSelection{LDAPString(`*`)}
+}
+
+func (r *Search) SetAllOperationalAttributes() {
+	r.Attributes = AttributeSelection{LDAPString(`+`)}
+}
+
+func (r *Search) SetAllAttributes() {
+	r.Attributes = AttributeSelection{
+		LDAPString(`+`), LDAPString(`*`)}
+}
+
+func (r *Search) SetDefaultFilter() {
+	r.Filter = defaultFilter
+}
+
 func (r *Search) AppendAttribute(at ...LDAPString) {
 	if r.Attributes == nil {
 		r.Attributes = make(AttributeSelection, 0)
@@ -155,8 +172,14 @@ func (r Search) Encode() ([]byte, error) {
 		base, err = r.BaseObject.Encode()
 		if err == nil {
 			var encDigits, typesOnly []byte
-			encDigits, _ = r.encodeDigits()
-			typesOnly, _ = r.TypesOnly.Encode()
+			encDigits, err = r.encodeDigits()
+			if err != nil {
+				return enc, err
+			}
+			typesOnly, err = r.TypesOnly.Encode()
+			if err != nil {
+				return enc, err
+			}
 
 			enc = append(enc, base...)
 			enc = append(enc, encDigits...)
@@ -169,14 +192,9 @@ func (r Search) Encode() ([]byte, error) {
 
 			if err == nil {
 				enc = append(enc, flt...)
-				if len(r.Attributes) > 0 {
-					var sel []byte
-					if sel, err = r.Attributes.Encode(); err == nil {
-						enc = append(enc, sel...)
-					}
-				}
-
-				if err == nil {
+				var sel []byte
+				if sel, err = r.Attributes.Encode(); err == nil {
+					enc = append(enc, sel...)
 					enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 3]
 				}
 			}
@@ -212,12 +230,26 @@ func (r *Search) Decode(enc []byte) error {
 				break
 			}
 		}
+
+		// set defaults wherever appropriate
+		if err == nil {
+			if r.Filter == nil {
+				r.SetDefaultFilter()
+			}
+			if len(r.Attributes) == 0 {
+				r.SetAllUserAttributes()
+			}
+		}
 	}
 
 	return err
 }
 
 func (r *Search) decodeBase(c *int, payload []byte) (err error) {
+	if tag, _ := readTag(payload); tag.Tag != uint32(tOct) {
+		return
+	}
+
 	var val []byte
 
 	val, err = readEPTLV(payload, c,
@@ -233,6 +265,9 @@ func (r *Search) decodeBase(c *int, payload []byte) (err error) {
 func (r *Search) decodeScope(c *int, payload []byte) (err error) {
 	p2 := 0
 	p := *c
+	if tag, _ := readTag(payload[p:]); tag.Tag != uint32(tEnum) {
+		return
+	}
 	_, err = readEPTLV(payload[p:], &p2,
 		classU, uint32(tEnum))
 
@@ -248,6 +283,10 @@ func (r *Search) decodeScope(c *int, payload []byte) (err error) {
 func (r *Search) decodeDeref(c *int, payload []byte) (err error) {
 	p2 := 0
 	p := *c
+	if tag, _ := readTag(payload[p:]); tag.Tag != uint32(tEnum) {
+		return
+	}
+
 	_, err = readEPTLV(payload[p:], &p2,
 		classU, uint32(tEnum))
 
@@ -263,6 +302,10 @@ func (r *Search) decodeDeref(c *int, payload []byte) (err error) {
 func (r *Search) decodeSizeLimit(c *int, payload []byte) (err error) {
 	p2 := 0
 	p := *c
+	if tag, _ := readTag(payload[p:]); tag.Tag != uint32(tInt) {
+		return
+	}
+
 	_, err = readEPTLV(payload[p:], &p2,
 		classU, uint32(tInt))
 
@@ -276,12 +319,12 @@ func (r *Search) decodeSizeLimit(c *int, payload []byte) (err error) {
 }
 
 func (r *Search) decodeTimeLimit(c *int, payload []byte) (err error) {
-	if tag, _ := readTag(payload); tag.Tag != uint32(tInt) {
+	p2 := 0
+	p := *c
+	if tag, _ := readTag(payload[p:]); tag.Tag != uint32(tInt) {
 		return
 	}
 
-	p2 := 0
-	p := *c
 	_, err = readEPTLV(payload[p:], &p2,
 		classU, uint32(tInt))
 
@@ -297,6 +340,10 @@ func (r *Search) decodeTimeLimit(c *int, payload []byte) (err error) {
 func (r *Search) decodeTypesOnly(c *int, payload []byte) (err error) {
 	p2 := 0
 	p := *c
+	if tag, _ := readTag(payload[p:]); tag.Tag != uint32(tBool) {
+		return
+	}
+
 	_, err = readEPTLV(payload[p:], &p2,
 		classU, uint32(tBool))
 
@@ -310,7 +357,6 @@ func (r *Search) decodeTypesOnly(c *int, payload []byte) (err error) {
 }
 
 func (r *Search) decodeFilter(c *int, payload []byte) (err error) {
-	p2 := 0
 	p := *c
 
 	// Unlike previous components of this type, filter
@@ -322,38 +368,17 @@ func (r *Search) decodeFilter(c *int, payload []byte) (err error) {
 		return
 	}
 
-	_, err = readECTLV(payload[p:], &p2,
-		classC, tag.Tag)
+        l, n := readLen(payload[p+1:])
+        filt := payload[p : 1+p+n+l]
 
-	if err == nil {
-		p2 += p
-		*c = p2
-		r.Filter, err = filterDecode(payload[p:p2])
-	}
+		*c += len(filt)
+		r.Filter, err = filterDecode(filt)
 
-	return
+	return err
 }
 
 func (r *Search) decodeAttributes(c *int, payload []byte) (err error) {
-	p2 := 0
-	p := *c
-
-	seqTag := uint32(tSeq) // SEQUENCE *OF*
-	tag, _ := readTag(payload[p:])
-	if tag.Tag != seqTag {
-		// not a SEQUENCE OF LDAPString ...
-		return
-	}
-
-	_, err = readECTLV(payload[p:], &p2,
-		classU, seqTag)
-
-	if err == nil {
-		p2 += p
-		*c = p2
-		err = r.Attributes.Decode(payload[p:p2])
-	}
-
+	err = r.Attributes.Decode(payload[*c:])
 	return
 }
 
@@ -374,6 +399,9 @@ func (r Search) encodeDigits() (enc []byte, err error) {
 			if e, err = ints[i].Encode(); err == nil {
 				enc = append(enc, e...)
 			}
+		}
+		if err != nil {
+			panic("slice: " + itoa(5) + " " + err.Error())
 		}
 	}
 

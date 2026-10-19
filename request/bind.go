@@ -161,9 +161,10 @@ func (r *Bind) Decode(enc []byte) error {
 				_, err = readEPTLV(payload, &p, classU, uint32(tOct))
 				if err == nil {
 					val = payload[:p]
-					if err = r.Name.Decode(val); err == nil {
-						err = r.setAuthChoice(payload[p:])
+					if len(val) > 2 {
+						err = r.Name.Decode(val)
 					}
+					err = r.setAuthChoice(payload[p:])
 				}
 			}
 		}
@@ -180,7 +181,12 @@ func (r *Bind) setAuthChoice(payload []byte) (err error) {
 		r.Authentication = creds
 	} else if tag.Tag == TagAuthenticationChoiceSimple {
 		creds := &SimpleCredentials{}
-		err = creds.Decode(payload)
+		if len(payload) > 2 {
+			err = creds.Decode(payload)
+			if err != nil {
+				panic(err)
+			}
+		}
 		r.Authentication = creds
 	} else {
 		err = protocolError("Bind Request: unknown AuthenticationChoice tag [",
@@ -303,12 +309,7 @@ an attempt to encode the contents of the receiver instance within
 a CONTEXT-SPECIFIC tag of [0], per [AuthenticationChoice].
 */
 func (r SimpleCredentials) Encode() ([]byte, error) {
-	//enc, err := OctetString(r).Encode()
-	//if err == nil {
-	enc, err := wrapTLV(r, r.classTag()) // CONTEXT-SPECIFIC [0]
-	//}
-
-	return enc, err
+	return wrapTLV(r, r.classTag()) // CONTEXT-SPECIFIC [0]
 }
 
 /*
@@ -319,12 +320,8 @@ circumscribing an [OctetString] encoding.
 */
 func (r *SimpleCredentials) Decode(enc []byte) error {
 	payload, err := unwrapTLV(enc, r.classTag()) // CONTEXT-SPECIFIC [0]
-
 	if err == nil {
-		var dec OctetString
-		if err = dec.Decode(payload); err == nil {
-			*r = SimpleCredentials(dec)
-		}
+		*r = SimpleCredentials(payload)
 	}
 
 	return err
