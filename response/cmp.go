@@ -28,6 +28,7 @@ func (r Compare) Encode() ([]byte, error) {
 	var enc []byte
 	res, err := LDAPResult(r).Encode() // LDAPResult SEQUENCE
 	if err == nil {
+		res, _ = unwrapTLV(res, uSeqTag())
 		enc, err = wrapTLV(res, r.classTag()) // [APPLICATION 15]
 	}
 
@@ -44,6 +45,7 @@ func (r *Compare) Decode(enc []byte) error {
 	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 15]
 	if err == nil {
 		var dec LDAPResult
+		payload, _ = wrapTLV(payload, uSeqTag())
 		if err = dec.Decode(payload); err == nil { // LDAPResult SEQUENCE
 			*r = Compare(dec)
 		}

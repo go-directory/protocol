@@ -25,10 +25,10 @@ an attempt to encode the contents of the receiver instance as an
 [APPLICATION 11] [LDAPResult] SEQUENCE.
 */
 func (r Del) Encode() ([]byte, error) {
-	var enc []byte
-	res, err := LDAPResult(r).Encode() // LDAPResult SEQUENCE
+	enc, err := LDAPResult(r).Encode() // LDAPResult SEQUENCE
 	if err == nil {
-		enc, err = wrapTLV(res, r.classTag()) // [APPLICATION 11]
+		enc, _ = unwrapTLV(enc, uSeqTag())
+		enc, err = wrapTLV(enc, r.classTag()) // [APPLICATION 11]
 	}
 
 	return enc, err
@@ -43,8 +43,9 @@ an [LDAPResult] SEQUENCE.
 func (r *Del) Decode(enc []byte) error {
 	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 11]
 	if err == nil {
+		payload, err = wrapTLV(payload, uSeqTag()) // SEQUENCE
 		var dec LDAPResult
-		if err = dec.Decode(payload); err == nil { // LDAPResult SEQUENCE
+		if err = dec.Decode(payload); err == nil {
 			*r = Del(dec)
 		}
 	}

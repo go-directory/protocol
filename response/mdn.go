@@ -28,6 +28,7 @@ func (r ModifyDN) Encode() ([]byte, error) {
 	var enc []byte
 	res, err := LDAPResult(r).Encode() // LDAPResult SEQUENCE
 	if err == nil {
+		res, _ = unwrapTLV(res, uSeqTag())
 		enc, err = wrapTLV(res, r.classTag()) // [APPLICATION 13]
 	}
 
@@ -43,6 +44,7 @@ func (r *ModifyDN) Decode(enc []byte) error {
 	payload, err := unwrapTLV(enc, r.classTag()) // [APPLICATION 13]
 	if err == nil {
 		var dec LDAPResult
+		payload, _ = wrapTLV(payload, uSeqTag())
 		if err = dec.Decode(payload); err == nil { // LDAPResult SEQUENCE
 			*r = ModifyDN(dec)
 		}
