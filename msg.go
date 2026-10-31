@@ -124,16 +124,17 @@ func (r *LDAPMessage) Decode(enc []byte) error {
 				p = 0
 				tag, _, _ := readCTLV(rest, &p)
 				r.ProtocolOp, err = readProtocolOp(tag, rest[:p]) // ProtocolOp==Response|Request
-				if err == nil && len(rest) > p {
-					var unwrap []byte
-					unwrap, err = unwrapTLV(rest[p:],
-						aTag(classC, true, uint32(0)))
-
-					if err == nil {
-						var dec Controls
-						if err = dec.Decode(unwrap); err == nil { // SEQUENCE OF control Control
-							r.Controls = &dec
-						} 
+				if err == nil {
+					if len(rest) > p {
+						var unwrap []byte
+						unwrap, err = unwrapTLV(rest[p:],
+							aTag(classC, true, uint32(0)))
+						if err == nil {
+							var dec Controls
+							if err = dec.Decode(unwrap); err == nil { // SEQUENCE OF control Control
+								r.Controls = &dec
+							}
+						}
 					}
 				}
 			}
