@@ -163,6 +163,10 @@ type ServerSideSorting struct {
 	ControlValue SortKeyList
 }
 
+func (r ServerSideSorting) String() string {
+	return "Type=" + r.Type().String() + ", Critical=" + bool2str(bool(r.Criticality)) + ", Value=TODO"
+}
+
 /*
 Type returns the [LDAPOID] by which this [Control] is recognized.
 */

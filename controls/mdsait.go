@@ -10,6 +10,10 @@ type ManageDsaIT struct {
 	Criticality Boolean
 }
 
+func (r ManageDsaIT) String() string {
+	return "Type=" + r.Type().String() + ", Critical=" + bool2str(bool(r.Criticality))
+}
+
 /*
 Encode returns an instance of []byte alongside an error following an
 attempt to encode the contents of the receiver instance as a UNIVERSAL

@@ -19,6 +19,10 @@ type PagedResults struct {
 	ControlValue PagedResultsSearchValue
 }
 
+func (r PagedResults) String() string {
+	return "Type=" + r.Type().String() + ", Critical=" + bool2str(bool(r.Criticality)) + ", Value=TODO"
+}
+
 /*
 Encode returns an instance of []byte alongside an error following an
 attempt to encode the contents of the receiver instance as a UNIVERSAL

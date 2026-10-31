@@ -18,6 +18,10 @@ type Standard struct {
 	ControlValue OctetString `asn1:"optional"`
 }
 
+func (r Standard) String() string {
+	return "Type=" + r.Type().String() + ", Critical=" + bool2str(bool(r.Criticality)) + ", Value=TODO"
+}
+
 /*
 Type returns the [LDAPOID] by which this [Control] is recognized.
 */
@@ -79,17 +83,15 @@ func (r *Standard) Decode(enc []byte) error {
 		p := 0
 		r.ControlType, err = readEPTLV(payload, &p, classU, uint32(tOct))
 
-		if err == nil {
+		if err == nil && p < len(payload[p:]) {
 			var critPayload []byte
 			critPayload, err = readEPTLV(payload, &p, classU, uint32(tBool))
-			if err == nil {
+			if err == nil && len(payload) > p {
 				r.Criticality = critPayload[0] == 0xFF
 
-				if p < len(payload) {
-					// OPTIONAL control value detected
-					r.ControlValue, err = readEPTLV(payload,
-						&p, classU, uint32(tOct))
-				}
+				// OPTIONAL control value detected
+				r.ControlValue, err = readEPTLV(payload,
+					&p, classU, uint32(tOct))
 			}
 		}
 	}

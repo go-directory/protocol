@@ -28,27 +28,28 @@ input encoding to the receiver instance. The encoding must not be
 truncated and must bear the UNIVERSAL SEQUENCE tag (0x30).
 */
 func (r *Subentries) Decode(enc []byte) error {
-	payload, err := unwrapTLV(enc, uSeqTag()) // SEQUENCE
+	payload, err := unwrapTLV(enc, uSeqTag())
 	if err == nil {
 		p := 0
 		var ctrlType []byte
 		ctrlType, err = readEPTLV(payload, &p, classU, uint32(tOct))
-		if err == nil {
-			if LDAPOID(ctrlType).Equal(OIDSubentries) {
-				if err == nil {
-					var critPayload []byte
-					critPayload, err = readEPTLV(payload, &p, classU, uint32(tBool))
-					if err == nil {
-						*r = Subentries(critPayload[0] == 0xFF)
-					}
-				}
+		if LDAPOID(ctrlType).Equal(OIDSubentries) {
+			if len(payload[p:]) > 2 {
+				*r = Subentries(payload[len(payload)-1] == 255 ||
+					string(payload[p+2:]) == "true")
 			} else {
-				err = ErrorUnexpectedControlType(OIDSubentries, ctrlType)
+				err = protocolError("Truncated Subentries BOOLEAN payload")
 			}
+		} else {
+			err = ErrorUnexpectedControlType(OIDSubentries, ctrlType)
 		}
 	}
 
 	return err
+}
+
+func (r Subentries) String() string {
+	return "Type=" + r.Type().String() + ", Critical=" + bool2str(bool(r))
 }
 
 /*

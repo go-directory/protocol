@@ -9,6 +9,10 @@ SubtreeDelete implements the Subtree Delete Control, as defined in
 */
 type SubtreeDelete struct{}
 
+func (r SubtreeDelete) String() string {
+	return "Type=" + r.Type().String() + ", Critical=false"
+}
+
 /*
 Type returns the [LDAPOID] by which this [Control] is recognized.
 */
