@@ -10,6 +10,11 @@ import (
 )
 
 /*
+	Control ::= SEQUENCE {
+		controlType             LDAPOID,
+		criticality             BOOLEAN DEFAULT FALSE,
+		controlValue            OCTET STRING OPTIONAL }
+
 Control implements [§ 4.1.11 of RFC4511] and serves as the slice type
 in an instance of [Controls].
 
@@ -94,16 +99,19 @@ ControlSubtreeDelete implements the Subtree Delete Control, as defined in
 */
 type ControlSubtreeDelete = controls.SubtreeDelete
 
+type ControlSubentries = controls.Subentries
+
 /*
 Control OIDs associated with [Control] definitions supported by this package.
 */
 var (
 	OIDControlTypePagedResults            = controls.OIDPagedResults            // RFC 2696
-	OIDControlTypeManageDsaIT             = controls.OIDManageDsaIT             // RFC3296
-	OIDControlTypeWhoAmI                  = controls.OIDWhoAmI                  // RFC4532
+	OIDControlTypeManageDsaIT             = controls.OIDManageDsaIT             // RFC 3296
+	OIDControlTypeWhoAmI                  = controls.OIDWhoAmI                  // RFC 4532
 	OIDControlTypeSubtreeDelete           = controls.OIDSubtreeDelete           // draft-armijo-ldap-treedelete
-	OIDControlTypeServerSideSorting       = controls.OIDServerSideSorting       // RFC2891
-	OIDControlTypeServerSideSortingResult = controls.OIDServerSideSortingResult // RFC2891
+	OIDControlTypeServerSideSorting       = controls.OIDServerSideSorting       // RFC 2891
+	OIDControlTypeServerSideSortingResult = controls.OIDServerSideSortingResult // RFC 2891
+	OIDControlTypeSubentries              = controls.OIDSubentries              // RFC 3671
 )
 
 /*
