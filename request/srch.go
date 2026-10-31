@@ -368,11 +368,11 @@ func (r *Search) decodeFilter(c *int, payload []byte) (err error) {
 		return
 	}
 
-        l, n := readLen(payload[p+1:])
-        filt := payload[p : 1+p+n+l]
+	l, n := readLen(payload[p+1:])
+	filt := payload[p : 1+p+n+l]
 
-		*c += len(filt)
-		r.Filter, err = filterDecode(filt)
+	*c += len(filt)
+	r.Filter, err = filterDecode(filt)
 
 	return err
 }

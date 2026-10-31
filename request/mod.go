@@ -5,15 +5,19 @@ package request
 		object          LDAPDN,
 		changes         SEQUENCE OF change SEQUENCE {
 			operation       ENUMERATED {
-				add     (0),
-				delete  (1),
-				replace (2),
+				add       (0),
+				delete    (1),
+				replace   (2),
+			        increment (3), -- extended by RFC 4525 --
 				...  },
 			modification    PartialAttribute } }
 
-Modify implements [§ 4.6 of RFC4511].
+Modify implements [§ 4.6 of RFC4511], with alterations provided through
+implementation of the "Modify-Increment Extension" as defined within
+[§ 2 of RFC4525].
 
 [§ 4.6 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.6
+[§ 2 of RFC4525]: https://datatracker.ietf.org/doc/html/rfc4525#section-2
 */
 type Modify struct {
 	Object  LDAPDN
@@ -23,9 +27,10 @@ type Modify struct {
 /*
 	change ::= SEQUENCE {
 		operation       ENUMERATED {
-			add     (0),
-			delete  (1),
-			replace (2),
+			add       (0),
+			delete    (1),
+			replace   (2),
+			increment (3), -- extended by RFC 4525 --
 			...  },
 		modification    PartialAttribute }
 
@@ -33,9 +38,10 @@ ModifyChange describes a single modification to the directory. Instances of
 this kind are found as slice values within the "Changes" field of a [Modify]
 instance.
 
-See [§ 4.6 of RFC4511] for details.
+See [§ 4.6 of RFC4511] and [§ 2 of RFC4525] for details.
 
 [§ 4.6 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.6
+[§ 2 of RFC4525]: https://datatracker.ietf.org/doc/html/rfc4525#section-2
 */
 type ModifyChange struct {
 	Operation    Enumerated
@@ -133,6 +139,26 @@ func (r *Modify) Replace(at AttributeDescription, av ...AttributeValue) {
 		// the request defines a zero-length value, probably
 		// of the OCTET STRING syntax.
 		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, AttributeValue(``))
+	}
+}
+
+/*
+Increment appends an "increment changetype" directive, as defined in [§ 2 of RFC4525]
+to the receiver using the provided [AttributeDescription] and [AttributeValue] instances.
+
+This helper requires one -- and only one -- [AttributeValue] per unique [AttributeDescription].
+
+This standard allows for negative increments (decrements).
+
+[§ 2 of RFC4525]: https://datatracker.ietf.org/doc/html/rfc4525#section-2
+*/
+func (r *Modify) Increment(at AttributeDescription, av ...AttributeValue) {
+	idx := r.IndexOf(at, ModifyChangeOperationIncrement)
+	if idx == -1 {
+		idx = r.allocateChange(at, ModifyChangeOperationIncrement)
+	}
+	if len(av) == 1 && len(r.Changes[idx].Modification.Vals) == 0 {
+		r.Changes[idx].Modification.Vals = append(r.Changes[idx].Modification.Vals, av...)
 	}
 }
 
@@ -268,8 +294,8 @@ func (r *ModifyChange) Decode(enc []byte) error {
 }
 
 func (r ModifyChange) validOperation() (err error) {
-	if !(0 <= r.Operation && r.Operation <= 2) {
-		err = protocolError("Modify change operation: invalid ENUMERATED value; want add(0), delete(1) or replace(2), got ",
+	if !(ModifyChangeOperationAdd <= r.Operation && r.Operation <= ModifyChangeOperationIncrement) {
+		err = protocolError("Modify change operation: invalid ENUMERATED value; want add(0), delete(1), replace(2) or increment(3), got ",
 			itoa(int(r.Operation)))
 	}
 
@@ -299,13 +325,15 @@ func (r Modify) IndexOf(at AttributeDescription, op Enumerated) int {
 Modify Change Operation tags.
 */
 const (
-	ModifyChangeOperationAdd     Enumerated = iota // 0
-	ModifyChangeOperationDelete                    // 1
-	ModifyChangeOperationReplace                   // 2
+	ModifyChangeOperationAdd       Enumerated = iota // 0
+	ModifyChangeOperationDelete                      // 1
+	ModifyChangeOperationReplace                     // 2
+	ModifyChangeOperationIncrement                   // 3 -- RFC 4525 --
 )
 
 var enumeratedModifyChangeOperation = map[Enumerated]string{
-	ModifyChangeOperationAdd:     "add",
-	ModifyChangeOperationDelete:  "delete",
-	ModifyChangeOperationReplace: "replace",
+	ModifyChangeOperationAdd:       "add",
+	ModifyChangeOperationDelete:    "delete",
+	ModifyChangeOperationReplace:   "replace",
+	ModifyChangeOperationIncrement: "increment",
 }

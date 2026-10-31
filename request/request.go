@@ -73,7 +73,7 @@ func DecodeByTag(tag Tag, enc []byte) (Request, error) {
 		err = dec.Decode(enc)
 		ret = dec
 	case TagCompare:
-		var dec Del
+		var dec Compare
 		err = dec.Decode(enc)
 		ret = dec
 	case TagAbandon:

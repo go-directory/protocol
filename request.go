@@ -98,11 +98,17 @@ ModifyRequest implements [§ 4.6 of RFC4511].
 */
 type ModifyRequest = request.Modify
 
-var NewModifyRequest = request.NewModify
+/*
+Modify Change Operation tags.
+*/
+const (
+	ModifyChangeOperationAdd       = request.ModifyChangeOperationAdd       // 0
+	ModifyChangeOperationDelete    = request.ModifyChangeOperationDelete    // 1
+	ModifyChangeOperationReplace   = request.ModifyChangeOperationReplace   // 2
+	ModifyChangeOperationIncrement = request.ModifyChangeOperationIncrement // 3 -- RFC 4525 --
+)
 
 type ModifyRequestChange = request.ModifyChange
-
-var NewModifyChange = request.NewModifyChange
 
 /*
 	ModifyDNRequest ::= [APPLICATION 12] SEQUENCE {
@@ -119,12 +125,32 @@ using the [RenameEntry], [MoveEntry] and [RenameAndMoveEntry] functions.
 type ModifyDNRequest = request.ModifyDN
 
 /*
-ModifyDN constructor alias.
+LDAP operation [request] constructor aliases.
 */
 var (
+	NewModifyRequest   = request.NewModify
+	NewModifyChange    = request.NewModifyChange
+	NewCompareRequest  = request.NewCompare
+	NewExtendedRequest = request.NewExtended
+	NewAddRequest      = request.NewAdd
+	NewBindRequest     = request.NewBind
+	NewUnbindRequest   = request.NewUnbind
+	NewDelRequest      = request.NewDel
+	NewSearchRequest   = request.NewSearch
+	NewAbandonRequest  = request.NewAbandon
+
+	// ModifyDN constructor aliases.
 	MoveEntry          = request.MoveEntry
 	RenameEntry        = request.RenameEntry
 	RenameAndMoveEntry = request.RenameAndMoveEntry
+)
+
+/*
+Bind [request] constructors.
+*/
+var (
+	SimpleBind   = request.SimpleBind
+	ExternalBind = request.ExternalBind
 )
 
 /*
@@ -138,8 +164,6 @@ CompareRequest implements [§ 4.10 of RFC4511].
 */
 type CompareRequest = request.Compare
 
-var NewCompareRequest = request.NewCompare
-
 /*
 	Extended ::= [APPLICATION 23] SEQUENCE {
 	     requestName      [0] LDAPOID,
@@ -151,8 +175,6 @@ Extended implements [§ 4.12 of RFC4511].
 */
 type ExtendedRequest = request.Extended
 
-var NewExtendedRequest = request.NewExtended
-
 /*
 	AddRequest ::= [APPLICATION 8] SEQUENCE {
 	     entry           LDAPDN,
@@ -163,8 +185,6 @@ AddRequest implements [§ 4.7 of RFC4511].
 [§ 4.7 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.7
 */
 type AddRequest = request.Add
-
-var NewAddRequest = request.NewAdd
 
 /*
 	BindRequest ::= [APPLICATION 0] SEQUENCE {
@@ -178,28 +198,6 @@ BindRequest implements [§ 4.2 of RFC4511].
 */
 type BindRequest = request.Bind
 
-var NewBindRequest = request.NewBind
-
-/*
-SimpleBind returns an instance of [BindRequest] in the context of a
-"simple" [request.AuthenticationChoice]. Successful use of this method
-will return the following structure:
-
-	  BindRequest{
-		Version: 3,
-		Name: LDAPDN(<the bind dn>),	     		  // LDAPDN (OCTET STRING)
-		Authentication: SimpleCredentials(<the bind pw>), // Authentication CHOICE [0], OCTET STRING
-	  }
-*/
-
-/*
-[Bind] constructor alias.
-*/
-var (
-	SimpleBind   = request.SimpleBind
-	ExternalBind = request.ExternalBind
-)
-
 /*
 	UnbindRequest ::= [APPLICATION 2] NULL
 
@@ -211,8 +209,6 @@ Note that there is no response counterpart definition for this type.
 */
 type UnbindRequest = request.Unbind
 
-var NewUnbindRequest = request.NewUnbind
-
 /*
 	DelRequest ::= [APPLICATION 10] LDAPDN
 
@@ -221,8 +217,6 @@ DelRequest implements [§ 4.8 of RFC4511].
 [§ 4.8 of RFC4511]: https://datatracker.ietf.org/doc/html/rfc4511#section-4.8
 */
 type DelRequest = request.Del
-
-var NewDelRequest = request.NewDel
 
 /*
 	scope ::= ENUMERATED {
@@ -284,8 +278,6 @@ SearchRequest implements [§ 4.5.1 of RFC4511].
 */
 type SearchRequest = request.Search
 
-var NewSearchRequest = request.NewSearch
-
 /*
 	AbandonRequest ::= [APPLICATION 16] MessageID
 
@@ -297,13 +289,11 @@ Note that there is no response counterpart definition for this type.
 */
 type AbandonRequest = request.Abandon
 
-var NewAbandonRequest = request.NewAbandon
-
 /*
 OIDs for various [Request] or [Response] notices.
 */
 var (
-	OIDNoticeOfDisconnection   = request.NoticeOfDisconnection   // 1.3.6.1.4.1.1466.2003
+	OIDNoticeOfDisconnection   = request.NoticeOfDisconnection   // 1.3.6.1.4.1.1466.20036
 	OIDNoticeOfCancel          = request.NoticeOfCancel          // 1.3.6.1.1.8
 	OIDNoticeOfStartTLS        = request.NoticeOfStartTLS        // 1.3.6.1.4.1.1466.20037
 	OIDNoticeOfWhoAmI          = request.NoticeOfWhoAmI          // 1.3.6.1.4.1.4203.1.11.3

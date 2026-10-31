@@ -105,12 +105,12 @@ func (r *Extended) Decode(enc []byte) error {
 Request and Response notice identifiers.
 */
 var (
-	NoticeOfDisconnection   = LDAPOID("1.3.6.1.4.1.1466.2003")
 	NoticeOfCancel          = LDAPOID("1.3.6.1.1.8")
+	NoticeOfDisconnection   = LDAPOID("1.3.6.1.4.1.1466.20036")
 	NoticeOfStartTLS        = LDAPOID("1.3.6.1.4.1.1466.20037")
-	NoticeOfWhoAmI          = LDAPOID("1.3.6.1.4.1.4203.1.11.3")
 	NoticeOfGetConnectionID = LDAPOID("1.3.6.1.4.1.26027.1.6.2")
 	NoticeOfPasswordModify  = LDAPOID("1.3.6.1.4.1.4203.1.11.1")
+	NoticeOfWhoAmI          = LDAPOID("1.3.6.1.4.1.4203.1.11.3")
 )
 
 /*

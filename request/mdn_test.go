@@ -74,10 +74,10 @@ func ExampleModifyDN_roundTripBER() {
 	fmt.Printf("Entry:     %s\n", dec.Entry)
 	fmt.Printf("NewRDN:    %s\n", dec.NewRDN)
 	fmt.Printf("DelOldRDN: %t\n", dec.DeleteOldRDN)
-	fmt.Printf("NewSup:    %s\n", dec.NewSuperior)
+	fmt.Printf("NewSup:    %q\n", dec.NewSuperior)
 	// Output:
 	// Entry:     uid=username,ou=accounts,o=acme
 	// NewRDN:    cn=Proper Name
 	// DelOldRDN: false
-	// NewSup:    ou=people,o=acme
+	// NewSup:    "ou=people,o=acme"
 }
