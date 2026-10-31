@@ -15,7 +15,10 @@ Aliases of [go-directory/syntax] types which need not be extended.
 */
 type (
 	LDAPDN               = syntax.LDAPDN
+	Boolean              = syntax.Boolean
 	LDAPString           = syntax.LDAPString
+	Enumerated           = syntax.Enumerated
+	OctetString          = syntax.OctetString
 	AttributeType        = syntax.AttributeType
 	AttributeList        = syntax.AttributeList
 	AttributeValue       = syntax.AttributeValue
